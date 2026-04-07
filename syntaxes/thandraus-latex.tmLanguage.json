@@ -440,8 +440,8 @@
 				},
 				{
 					"name": "meta.definition.command.latex",
-					"match": "(\\\\)(newcommand|renewcommand|providecommand|DeclareRobustCommand)(\\*?)(\\{)(\\\\[A-Za-z@]+)(\\})(?:([\\[])(\\d+)([\\]]))?(?:([\\[])([^\\]]*)([\\]]))?",
-					"captures": {
+					"begin": "(\\\\)(newcommand|renewcommand|providecommand|DeclareRobustCommand)(\\*?)(\\{)(\\\\[A-Za-z@]+)(\\})(?:([\\[])(\\d+)([\\]]))?(?:([\\[])([^\\]]*)([\\]]))?(?=\\s*\\{)",
+					"beginCaptures": {
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.definition.command.latex" },
 						"3": { "name": "keyword.operator.modifier.star.latex" },
@@ -454,7 +454,19 @@
 						"10": { "name": "punctuation.section.optional.begin.latex" },
 						"11": { "name": "meta.default-argument.latex" },
 						"12": { "name": "punctuation.section.optional.end.latex" }
-					}
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#latex-balanced-text-group" },
+						{ "include": "#tex-parameter-placeholders" },
+						{ "include": "#expl3-definition-forms" },
+						{ "include": "#expl3-kernel-families" },
+						{ "include": "#expl3-control-families" },
+						{ "include": "#expl3-special-forms" },
+						{ "include": "#expl3-functions" },
+						{ "include": "#expl3-variables" },
+						{ "include": "#generic-commands" }
+					]
 				},
 				{
 					"match": "(\\\\)(newcommand|renewcommand|providecommand|DeclareRobustCommand)(\\*?)",
@@ -466,8 +478,8 @@
 				},
 				{
 					"name": "meta.definition.environment.latex",
-					"match": "(\\\\)(newenvironment|renewenvironment)(\\*?)(\\{)([A-Za-z*@-]+)(\\})(?:([\\[])(\\d+)([\\]]))?(?:([\\[])([^\\]]*)([\\]]))?",
-					"captures": {
+					"begin": "(\\\\)(newenvironment|renewenvironment)(\\*?)(\\{)([A-Za-z*@-]+)(\\})(?:([\\[])(\\d+)([\\]]))?(?:([\\[])([^\\]]*)([\\]]))?(?=\\s*\\{)",
+					"beginCaptures": {
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.definition.environment.latex" },
 						"3": { "name": "keyword.operator.modifier.star.latex" },
@@ -480,7 +492,19 @@
 						"10": { "name": "punctuation.section.optional.begin.latex" },
 						"11": { "name": "meta.default-argument.latex" },
 						"12": { "name": "punctuation.section.optional.end.latex" }
-					}
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#latex-balanced-text-group" },
+						{ "include": "#tex-parameter-placeholders" },
+						{ "include": "#expl3-definition-forms" },
+						{ "include": "#expl3-kernel-families" },
+						{ "include": "#expl3-control-families" },
+						{ "include": "#expl3-special-forms" },
+						{ "include": "#expl3-functions" },
+						{ "include": "#expl3-variables" },
+						{ "include": "#generic-commands" }
+					]
 				},
 				{
 					"match": "(\\\\)(newenvironment|renewenvironment)(\\*?)",
