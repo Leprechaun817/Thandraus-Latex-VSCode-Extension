@@ -1,0 +1,33 @@
+{
+	"name": "thandraus-latex",
+	"displayName": "Thandraus LaTeX Syntax",
+	"description": "Custom TeX/LaTeX + expl3 + codex-aware syntax highlighting for VS Code.",
+	"version": "0.0.8",
+	"publisher": "Leprechaun817",
+	"engines": {
+		"vscode": "^1.97.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "latex",
+				"aliases": ["LaTeX", "latex", "TeX", "tex"],
+				"extensions": [".tex", ".sty", ".cls", ".dtx", ".ltx"],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "latex",
+				"scopeName": "text.tex.latex.thandraus",
+				"path": "./syntaxes/thandraus-latex.tmLanguage.json",
+				"balancedBracketScopes": ["*"],
+				"unbalancedBracketScopes": ["comment.line.percentage.latex",
+											"text.verbatim.latex"]
+			}
+		]
+	}
+}

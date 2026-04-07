@@ -1,0 +1,30 @@
+{
+					"name": "meta.preamble.class.latex",
+					"begin": "(\\\\)(documentclass)(\\*?)(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.preamble.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" },
+						"4": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "entity.name.class.latex"
+				},
+				{
+					"name": "meta.preamble.package.latex",
+					"begin": "(\\\\)(usepackage|RequirePackage|LoadClass|LoadPackage)(\\*?)(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.preamble.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" },
+						"4": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "entity.name.package.latex"
+				},

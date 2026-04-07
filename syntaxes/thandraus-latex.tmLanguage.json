@@ -1,0 +1,765 @@
+{
+	"scopeName": "text.tex.latex.thandraus",
+	"name": "Thandraus LaTeX",
+	"patterns": [
+		{ "include": "#comments" },
+		{ "include": "#verbatim" },
+		{ "include": "#math-display" },
+		{ "include": "#math-inline" },
+		{ "include": "#environments" },
+		{ "include": "#latex-preamble" },
+		{ "include": "#latex-structure" },
+		{ "include": "#latex-references" },
+		{ "include": "#latex-core-commands" },
+		{ "include": "#latex-escaped-specials" },
+		{ "include": "#expl3-kernel-families" },
+		{ "include": "#expl3-control-families" },
+		{ "include": "#expl3-definition-forms" },
+		{ "include": "#expl3-special-forms" },
+		{ "include": "#expl3-functions" },
+		{ "include": "#expl3-variables" },
+		{ "include": "#codex-commands" },
+		{ "include": "#tex-parameter-placeholders" },
+		{ "include": "#generic-commands" },
+		{ "include": "#delimiters" }
+	],
+	"repository": {
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.line.percentage.latex",
+					"match": "(?<!\\\\)%.*$"
+				}
+			]
+		},
+		"verbatim": {
+			"patterns": [
+				{
+					"name": "text.verbatim.latex",
+					"begin": "\\\\begin\\{(?:verbatim\\*?|lstlisting|minted)\\}",
+					"end": "\\\\end\\{(?:verbatim\\*?|lstlisting|minted)\\}"
+				},
+				{
+					"name": "text.verbatim.inline.latex",
+					"match": "\\\\verb\\*?(.)[^\\1]*\\1"
+				}
+			]
+		},
+		"math-display": {
+			"patterns": [
+				{
+					"name": "meta.math.display.latex",
+					"begin": "\\$\\$",
+					"end": "\\$\\$",
+					"patterns": [
+						{ "include": "#expl3-definition-forms" },
+						{ "include": "#expl3-kernel-families" },
+						{ "include": "#expl3-control-families" },
+						{ "include": "#expl3-special-forms" },
+						{ "include": "#expl3-functions" },
+						{ "include": "#expl3-variables" },
+						{ "include": "#tex-parameter-placeholders" },
+						{ "include": "#generic-commands" }
+					]
+				},
+				{
+					"name": "meta.math.display.latex",
+					"begin": "\\\\\\[",
+					"end": "\\\\\\]",
+					"patterns": [
+						{ "include": "#expl3-definition-forms" },
+						{ "include": "#expl3-kernel-families" },
+						{ "include": "#expl3-control-families" },
+						{ "include": "#expl3-special-forms" },
+						{ "include": "#expl3-functions" },
+						{ "include": "#expl3-variables" },
+						{ "include": "#tex-parameter-placeholders" },
+						{ "include": "#generic-commands" }
+					]
+				}
+			]
+		},
+		"math-inline": {
+			"patterns": [
+				{
+					"name": "meta.math.inline.latex",
+					"begin": "(?<!\\\\)\\$",
+					"end": "(?<!\\\\)\\$",
+					"patterns": [
+						{ "include": "#expl3-definition-forms" },
+						{ "include": "#expl3-kernel-families" },
+						{ "include": "#expl3-control-families" },
+						{ "include": "#expl3-special-forms" },
+						{ "include": "#expl3-functions" },
+						{ "include": "#expl3-variables" },
+						{ "include": "#tex-parameter-placeholders" },
+						{ "include": "#generic-commands" }
+					]
+				},
+				{
+					"name": "meta.math.inline.latex",
+					"begin": "\\\\\\(",
+					"end": "\\\\\\)",
+					"patterns": [
+						{ "include": "#expl3-definition-forms" },
+						{ "include": "#expl3-kernel-families" },
+						{ "include": "#expl3-control-families" },
+						{ "include": "#expl3-special-forms" },
+						{ "include": "#expl3-functions" },
+						{ "include": "#expl3-variables" },
+						{ "include": "#tex-parameter-placeholders" },
+						{ "include": "#generic-commands" }
+					]
+				}
+			]
+		},
+		"environments": {
+			"patterns": [
+				{
+					"match": "(\\\\)(begin|end)(\\{)([^}]+)(\\})",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.environment.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" },
+						"4": { "name": "entity.name.environment.latex" },
+						"5": { "name": "punctuation.definition.group.end.latex" }
+					}
+				}
+			]
+		},
+		"latex-preamble": {
+			"patterns": [
+				{
+					"name": "meta.preamble.class.latex",
+					"begin": "(\\\\)(documentclass)(\\*?)(?=\\s*(?:\\[|\\{))",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.preamble.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#latex-preamble-options-region" },
+						{ "include": "#latex-preamble-class-region" }
+					]
+				},
+				{
+					"name": "meta.preamble.package.latex",
+					"begin": "(\\\\)(usepackage|RequirePackage|LoadClass|LoadPackage)(\\*?)(?=\\s*(?:\\[|\\{))",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.preamble.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#latex-preamble-options-region" },
+						{ "include": "#latex-preamble-package-region" }
+					]
+				},
+				{
+					"match": "(\\\\)(documentclass|usepackage|RequirePackage|LoadClass|LoadPackage)(\\*?)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.preamble.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" }
+					}
+				}
+			]
+		},
+		"latex-preamble-options-region": {
+			"patterns": [
+				{
+					"name": "meta.preamble.options.latex",
+					"begin": "(\\[)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.section.optional.begin.latex" }
+					},
+					"end": "(\\])",
+					"endCaptures": {
+						"1": { "name": "punctuation.section.optional.end.latex" }
+					},
+					"patterns": [
+						{
+							"match": ",",
+							"name": "punctuation.separator.comma.latex"
+						},
+						{
+							"match": "=",
+							"name": "keyword.operator.assignment.latex"
+						},
+						{
+							"match": "(?<=[\\[,])\\s*([A-Za-z@][A-Za-z0-9@._:-]*)(?=\\s*=)",
+							"captures": {
+								"1": { "name": "variable.parameter.option.latex" }
+							}
+						},
+						{
+							"match": "(?<=\\=)\\s*((?i:true|false|yes|no|on|off))\\b",
+							"captures": {
+								"1": { "name": "constant.language.boolean.latex" }
+							}
+						},
+						{
+							"match": "(?<=\\=)\\s*([A-Za-z@][A-Za-z0-9@._:-]*)",
+							"captures": {
+								"1": { "name": "string.unquoted.option-value.latex" }
+							}
+						},
+						{
+							"match": "(?<=[\\[,])\\s*([A-Za-z0-9@._:-]+)(?=\\s*(?:,|\\]))",
+							"captures": {
+								"1": { "name": "variable.parameter.option.latex" }
+							}
+						}
+					]
+				}
+			]
+		},
+		"latex-preamble-class-region": {
+			"patterns": [
+				{
+					"name": "meta.preamble.class-name.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"patterns": [
+						{
+							"match": "[A-Za-z@][A-Za-z0-9@._-]*",
+							"name": "entity.name.class.latex"
+						}
+					]
+				}
+			]
+		},
+		"latex-preamble-package-region": {
+			"patterns": [
+				{
+					"name": "meta.preamble.package-list.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"patterns": [
+						{
+							"match": ",",
+							"name": "punctuation.separator.comma.latex"
+						},
+						{
+							"match": "[A-Za-z@][A-Za-z0-9@._-]*",
+							"name": "entity.name.package.latex"
+						}
+					]
+				}
+			]
+		},
+		"latex-balanced-text-group": {
+			"patterns": [
+				{
+					"name": "meta.group.braces.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"patterns": [
+						{ "include": "#latex-balanced-text-group" },
+						{ "include": "#latex-core-commands" },
+						{ "include": "#latex-references" },
+						{ "include": "#latex-escaped-specials" },
+						{ "include": "#expl3-definition-forms" },
+						{ "include": "#expl3-kernel-families" },
+						{ "include": "#expl3-control-families" },
+						{ "include": "#expl3-special-forms" },
+						{ "include": "#expl3-functions" },
+						{ "include": "#expl3-variables" },
+						{ "include": "#tex-parameter-placeholders" },
+						{ "include": "#generic-commands" }
+					]
+				}
+			]
+		},
+		"latex-structure": {
+			"patterns": [
+				{
+					"match": "(\\\\)(part|chapter|section|subsection|subsubsection|paragraph|subparagraph)(\\*?)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "entity.name.section.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(tableofcontents|maketitle|title|author|date)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.structure.latex" }
+					}
+				}
+			]
+		},
+		"latex-references": {
+			"patterns": [
+				{
+					"name": "meta.reference.label.latex",
+					"begin": "(\\\\)(label)(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.reference.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "entity.name.label.latex"
+				},
+				{
+					"name": "meta.reference.link.latex",
+					"begin": "(\\\\)(ref|pageref|eqref|autoref|cref|Cref)(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.reference.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "variable.other.reference.latex"
+				},
+				{
+					"name": "meta.reference.citation.latex",
+					"begin": "(\\\\)(cite|textcite|parencite)(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.reference.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "variable.other.citation.latex"
+				},
+				{
+					"match": "(\\\\)(label|ref|pageref|eqref|autoref|cref|Cref|cite|textcite|parencite)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.reference.latex" }
+					}
+				}
+			]
+		},
+		"latex-core-commands": {
+			"patterns": [
+				{
+					"name": "meta.include.file.latex",
+					"begin": "(\\\\)(input|include)(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.include.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "string.unquoted.filename.latex"
+				},
+				{
+					"name": "meta.reference.url.latex",
+					"begin": "(\\\\)(url)(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.reference.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "markup.underline.link.latex"
+				},
+				{
+					"name": "meta.reference.href.latex",
+					"match": "(\\\\)(href)(\\{)((?:[^{}]|\\{[^{}]*\\})*)(\\})(\\{)((?:[^{}]|\\{[^{}]*\\})*)(\\})",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.reference.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" },
+						"4": { "name": "markup.underline.link.latex" },
+						"5": { "name": "punctuation.definition.group.end.latex" },
+						"6": { "name": "punctuation.definition.group.begin.latex" },
+						"7": { "name": "string.other.link-title.latex" },
+						"8": { "name": "punctuation.definition.group.end.latex" }
+					}
+				},
+				{
+					"name": "meta.annotation.footnote.latex",
+					"begin": "(\\\\)(footnote|marginpar)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.reference.latex" }
+					},
+					"end": "(?<=\\})(?=\\s*(?:[^\\{]|$))",
+					"patterns": [
+						{ "include": "#latex-balanced-text-group" }
+					]
+				},
+				{
+					"name": "meta.formatting.inline.latex",
+					"begin": "(\\\\)(emph|textbf|textit|texttt|underline)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.formatting.latex" }
+					},
+					"end": "(?<=\\})(?=\\s*(?:[^\\{]|$))",
+					"patterns": [
+						{ "include": "#latex-balanced-text-group" }
+					]
+				},
+				{
+					"match": "(\\\\)(input|include)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.include.latex" }
+					}
+				},
+				{
+					"name": "meta.definition.command.latex",
+					"match": "(\\\\)(newcommand|renewcommand|providecommand|DeclareRobustCommand)(\\*?)(\\{)(\\\\[A-Za-z@]+)(\\})(?:([\\[])(\\d+)([\\]]))?(?:([\\[])([^\\]]*)([\\]]))?",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.command.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" },
+						"4": { "name": "punctuation.definition.group.begin.latex" },
+						"5": { "name": "entity.name.function.defined.latex" },
+						"6": { "name": "punctuation.definition.group.end.latex" },
+						"7": { "name": "punctuation.section.optional.begin.latex" },
+						"8": { "name": "constant.numeric.argument-count.latex" },
+						"9": { "name": "punctuation.section.optional.end.latex" },
+						"10": { "name": "punctuation.section.optional.begin.latex" },
+						"11": { "name": "meta.default-argument.latex" },
+						"12": { "name": "punctuation.section.optional.end.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(newcommand|renewcommand|providecommand|DeclareRobustCommand)(\\*?)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.command.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" }
+					}
+				},
+				{
+					"name": "meta.definition.environment.latex",
+					"match": "(\\\\)(newenvironment|renewenvironment)(\\*?)(\\{)([A-Za-z*@-]+)(\\})(?:([\\[])(\\d+)([\\]]))?(?:([\\[])([^\\]]*)([\\]]))?",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.environment.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" },
+						"4": { "name": "punctuation.definition.group.begin.latex" },
+						"5": { "name": "entity.name.environment.defined.latex" },
+						"6": { "name": "punctuation.definition.group.end.latex" },
+						"7": { "name": "punctuation.section.optional.begin.latex" },
+						"8": { "name": "constant.numeric.argument-count.latex" },
+						"9": { "name": "punctuation.section.optional.end.latex" },
+						"10": { "name": "punctuation.section.optional.begin.latex" },
+						"11": { "name": "meta.default-argument.latex" },
+						"12": { "name": "punctuation.section.optional.end.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(newenvironment|renewenvironment)(\\*?)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.environment.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(appendix|listoffigures|listoftables)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.structure.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(footnote|marginpar|url|href)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.reference.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(emph|textbf|textit|texttt|underline)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.formatting.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(frac|sqrt|left|right)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.math.latex"}
+					}
+				}
+			]
+		},
+		"latex-escaped-specials": {
+			"patterns": [
+				{
+					"match": "\\\\[%#$&{}_]",
+					"name": "constant.character.escape.latex"
+				}
+			]
+		},
+		"expl3-kernel-families": {
+			"patterns": [
+				{
+					"match": "(\\\\cs_[A-Za-z@]+(?:_[A-Za-z@]+)*)(:)([A-Za-z]+)",
+					"captures": {
+						"1": { "name": "entity.name.function.expl3.cs.latex" },
+						"2": { "name": "punctuation.separator.signature.expl3.latex" },
+						"3": { "name": "storage.type.signature.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\(?:tl|str|seq|clist|prop|keys)_[A-Za-z@]+(?:_[A-Za-z@]+)*)(:)([A-Za-z]+)",
+					"captures": {
+						"1": { "name": "entity.name.function.expl3.data.latex" },
+						"2": { "name": "punctuation.separator.signature.expl3.latex" },
+						"3": { "name": "storage.type.signature.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\(?:int|dim|skip|muskip|fp|bool)_[A-Za-z@]+(?:_[A-Za-z@]+)*)(:)([A-Za-z]+)",
+					"captures": {
+						"1": { "name": "entity.name.function.expl3.numeric.latex" },
+						"2": { "name": "punctuation.separator.signature.expl3.latex" },
+						"3": { "name": "storage.type.signature.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\(?:prg|quark|peek|group|sys|msg|file|ior|iow|box|coffin|regex)_[A-Za-z@]+(?:_[A-Za-z@]+)*)(:)([A-Za-z]+)",
+					"captures": {
+						"1": { "name": "entity.name.function.expl3.kernel.latex" },
+						"2": { "name": "punctuation.separator.signature.expl3.latex" },
+						"3": { "name": "storage.type.signature.expl3.latex" }
+					}
+				}
+			]
+		},
+		"expl3-control-families": {
+			"patterns": [
+				{
+					"match": "(\\\\(?:prg|bool)_[A-Za-z@]+(?:_[A-Za-z@]+)*)(:)([A-Za-z]+)",
+					"captures": {
+						"1": { "name": "entity.name.function.expl3.control.latex" },
+						"2": { "name": "punctuation.separator.signature.expl3.latex" },
+						"3": { "name": "storage.type.signature.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\(?:exp|use|token|char)_[A-Za-z@]+(?:_[A-Za-z@]+)*)(:)([A-Za-z]+)",
+					"captures": {
+						"1": { "name": "entity.name.function.expl3.expansion.latex" },
+						"2": { "name": "punctuation.separator.signature.expl3.latex" },
+						"3": { "name": "storage.type.signature.expl3.latex" }
+					}
+				}
+			]
+		},
+		"expl3-definition-forms": {
+			"patterns": [
+				{
+					"match": "(\\\\)(cs_(?:new|set|gset)(?:_protected)?)(:)([A-Za-z]+)(\\s*)(\\\\[A-Za-z@]+(?:_[A-Za-z@]+)*(?::[A-Za-z]+)?)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.expl3.cs.latex" },
+						"3": { "name": "punctuation.separator.signature.expl3.latex" },
+						"4": { "name": "storage.type.signature.expl3.latex" },
+						"6": { "name": "entity.name.function.defined.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(cs_generate_variant)(:)([A-Za-z]+)(\\s*)(\\\\[A-Za-z@]+(?:_[A-Za-z@]+)*(?::[A-Za-z]+)?)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.expl3.variant.latex" },
+						"3": { "name": "punctuation.separator.signature.expl3.latex" },
+						"4": { "name": "storage.type.signature.expl3.latex" },
+						"6": { "name": "entity.name.function.expl3.variant-source.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)((?:tl|str|seq|clist|prop|bool|int|dim|skip|muskip|fp|box|coffin|ior|iow|regex)_new)(:)(N)(\\s*)(\\\\[lgc]__?[A-Za-z@]+(?:_[A-Za-z@]+)*_(?:tl|str|seq|clist|prop|int|dim|skip|muskip|fp|bool|box|coffin|ior|iow|regex))",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.expl3.variable.latex" },
+						"3": { "name": "punctuation.separator.signature.expl3.latex" },
+						"4": { "name": "storage.type.signature.expl3.latex" },
+						"6": { "name": "variable.other.expl3.defined.latex" }
+					}
+				
+				}
+			]
+		},
+		"expl3-special-forms": {
+			"patterns": [
+				{
+					"match": "\\\\scan_stop:",
+					"name": "constant.language.expl3.special-form.latex"
+				},
+				{
+					"match": "\\\\c_(?:space|empty)_tl",
+					"name": "constant.language.expl3.builtin.latex"
+				},
+				{
+					"match": "\\\\c_(?:zero|one|minus_one)_int",
+					"name": "constant.language.expl3.builtin.latex"
+				}
+			]
+		},
+		"expl3-functions": {
+			"patterns": [
+				{
+					"match": "(\\\\__[A-Za-z@]+(?:_[A-Za-z@]+)*)(:)([A-Za-z]+)",
+					"captures": {
+						"1": { "name": "entity.name.function.expl3.private.latex" },
+						"2": { "name": "punctuation.separator.signature.expl3.latex" },
+						"3": { "name": "storage.type.signature.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\[A-Za-z@]+(?:_[A-Za-z@]+)+)(:)([A-Za-z]+)",
+					"captures": {
+						"1": { "name": "entity.name.function.expl3.public.latex" },
+						"2": { "name": "punctuation.separator.signature.expl3.latex" },
+						"3": { "name": "storage.type.signature.expl3.latex" }
+					}
+				}
+			]
+		},
+		"expl3-variables": {
+			"patterns": [
+				{
+					"match": "\\\\c_(?:true|false)_bool",
+					"name": "constant.language.boolean.expl3.latex"
+				},
+				{
+					"match": "(\\\\l__[A-Za-z@]+(?:_[A-Za-z@]+)*_)(tl|str|seq|clist|prop|int|dim|skip|muskip|fp|bool|box|coffin|ior|iow|regex)",
+					"captures": {
+						"1": { "name": "variable.other.expl3.private.local.latex" },
+						"2": { "name": "storage.type.variable.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\g__[A-Za-z@]+(?:_[A-Za-z@]+)*_)(tl|str|seq|clist|prop|int|dim|skip|muskip|fp|bool|box|coffin|ior|iow|regex)",
+					"captures": {
+						"1": { "name": "variable.other.expl3.private.global.latex" },
+						"2": { "name": "storage.type.variable.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\c__[A-Za-z@]+(?:_[A-Za-z@]+)*_)(tl|str|seq|clist|prop|int|dim|skip|muskip|fp|bool|box|coffin|ior|iow|regex)",
+					"captures": {
+						"1": { "name": "constant.other.expl3.private.latex" },
+						"2": { "name": "storage.type.variable.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\l_[A-Za-z@]+(?:_[A-Za-z@]+)*_)(tl|str|seq|clist|prop|int|dim|skip|muskip|fp|bool|box|coffin|ior|iow|regex)",
+					"captures": {
+						"1": { "name": "variable.other.expl3.local.latex" },
+						"2": { "name": "storage.type.variable.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\g_[A-Za-z@]+(?:_[A-Za-z@]+)*_)(tl|str|seq|clist|prop|int|dim|skip|muskip|fp|bool|box|coffin|ior|iow|regex)",
+					"captures": {
+						"1": { "name": "variable.other.expl3.global.latex" },
+						"2": { "name": "storage.type.variable.expl3.latex" }
+					}
+				},
+				{
+					"match": "(\\\\c_[A-Za-z@]+(?:_[A-Za-z@]+)*_)(tl|str|seq|clist|prop|int|dim|skip|muskip|fp|bool|box|coffin|ior|iow|regex)",
+					"captures": {
+						"1": { "name": "constant.other.expl3.latex" },
+						"2": { "name": "storage.type.variable.expl3.latex" }
+					}
+				},
+				{
+					"match": "\\\\(?:q|s)_[A-Za-z@]+(?:_[A-Za-z@]+)*",
+					"name": "constant.language.expl3.special.latex"				
+				}
+			]
+		},
+		"codex-commands": {
+			"patterns": [
+				{
+					"match": "\\\\(?:SetCodexHeader|CodexSection|CodexSubsection|CodexAbstract|CodexFrontmatter|CodexBodyOpen)\\b",
+					"name": "support.function.codex.structure.latex"
+				},
+				{
+					"match": "\\\\(?:TitleElementAuthority|TitleElementCodexCollection|TitleElementDesignation|TitleElementDocumentClass|TitleElementDocumentNumber|TitleElementRevisionKind|TitleElementRevisionID|TitleElementTitle)\\b",
+					"name": "support.function.codex.header.latex"
+				}
+			]
+		},
+		"tex-parameter-placeholders": {
+			"patterns": [
+				{
+					"match": "##",
+					"name": "keyword.operator.parameter.escape.latex"
+				},
+				{
+					"match": "#[1-9]",
+					"name": "variable.parameter.macro.latex"
+				}
+			]
+		},
+		"generic-commands": {
+			"patterns": [
+				{
+					"match": "\\\\[A-Za-z@]+|\\\\.",
+					"name": "support.function.general.latex"
+				}
+			]
+		},
+		"delimiters": {
+			"patterns": [
+				{
+					"match": "[{}]",
+					"name": "punctuation.section.group.latex"
+				},
+				{
+					"match": "[\\[\\]]",
+					"name": "punctuation.section.optional.latex"
+				},
+				{
+					"match": ",",
+					"name": "punctuation.separator.comma.latex"
+				},
+				{
+					"match": "=",
+					"name": "keyword.operator.assignment.latex"
+				}
+			]
+		}
+	}
+}
