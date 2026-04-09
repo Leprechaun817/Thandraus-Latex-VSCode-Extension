@@ -291,6 +291,35 @@
 				}
 			]
 		},
+		"latex-environment-definition-body": {
+			"patterns": [
+				{
+					"name": "meta.definition.environment.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": { 
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"patterns": [
+						{ "include": "#latex-environment-definition-body" },
+						{ "include": "#latex-core-commands" },
+						{ "include": "#latex-references" },
+						{ "include": "#latex-escaped-specials" },
+						{ "include": "#expl3-definition-forms" },
+						{ "include": "#expl3-kernel-families" },
+						{ "include": "#expl3-control-families" },
+						{ "include": "#expl3-special-forms" },
+						{ "include": "#expl3-functions" },
+						{ "include": "#expl3-variables" },
+						{ "include": "#tex-parameter-placeholders"},
+						{ "include": "#generic-commands" }
+					]
+				}
+			]
+		},
 		"latex-structure": {
 			"patterns": [
 				{
@@ -493,17 +522,9 @@
 						"11": { "name": "meta.default-argument.latex" },
 						"12": { "name": "punctuation.section.optional.end.latex" }
 					},
-					"end": "(?<=\\})",
+					"end": "(?<=\\})(?!\\s*\\{)",
 					"patterns": [
-						{ "include": "#latex-balanced-text-group" },
-						{ "include": "#tex-parameter-placeholders" },
-						{ "include": "#expl3-definition-forms" },
-						{ "include": "#expl3-kernel-families" },
-						{ "include": "#expl3-control-families" },
-						{ "include": "#expl3-special-forms" },
-						{ "include": "#expl3-functions" },
-						{ "include": "#expl3-variables" },
-						{ "include": "#generic-commands" }
+						{ "include": "#latex-environment-definition-body" }
 					]
 				},
 				{
