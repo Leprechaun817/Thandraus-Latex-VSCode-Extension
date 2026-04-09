@@ -291,6 +291,25 @@
 				}
 			]
 		},
+		"latex-environment-definition-header": {
+			"patterns": [
+				{
+					"name": "meta.definition.environment.header.latex",
+					"match": "(\\{)([A-Za-z*@-]+)(\\})(?:([\\[])(\\d+)([\\]]))?(?:([\\[])([^\\]]*)([\\]]))?",
+					"captures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" },
+						"2": { "name": "entity.name.environment.defined.latex" },
+						"3": { "name": "punctuation.definition.group.end.latex" },
+						"4": { "name": "punctuation.section.optional.begin.latex" },
+						"5": { "name": "constant.numeric.argument-count.latex" },
+						"6": { "name": "punctuation.section.optional.end.latex" },
+						"7": { "name": "punctuation.section.optional.begin.latex" },
+						"8": { "name": "meta.default-argument.latex" },
+						"9": { "name": "punctuation.section.optional.end.latex" }
+					}
+				}
+			]
+		},
 		"latex-environment-definition-body": {
 			"patterns": [
 				{
@@ -303,6 +322,7 @@
 					"endCaptures": { 
 						"1": { "name": "punctuation.definition.group.end.latex" }
 					},
+					"contentName": "meta.definition.environment.body.content.latex",
 					"patterns": [
 						{ "include": "#latex-environment-definition-body" },
 						{ "include": "#latex-core-commands" },
@@ -507,23 +527,15 @@
 				},
 				{
 					"name": "meta.definition.environment.latex",
-					"begin": "(\\\\)(newenvironment|renewenvironment)(\\*?)(\\{)([A-Za-z*@-]+)(\\})(?:([\\[])(\\d+)([\\]]))?(?:([\\[])([^\\]]*)([\\]]))?(?=\\s*\\{)",
+					"begin": "(\\\\)(newenvironment|renewenvironment)(\\*?)",
 					"beginCaptures": {
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.definition.environment.latex" },
-						"3": { "name": "keyword.operator.modifier.star.latex" },
-						"4": { "name": "punctuation.definition.group.begin.latex" },
-						"5": { "name": "entity.name.environment.defined.latex" },
-						"6": { "name": "punctuation.definition.group.end.latex" },
-						"7": { "name": "punctuation.section.optional.begin.latex" },
-						"8": { "name": "constant.numeric.argument-count.latex" },
-						"9": { "name": "punctuation.section.optional.end.latex" },
-						"10": { "name": "punctuation.section.optional.begin.latex" },
-						"11": { "name": "meta.default-argument.latex" },
-						"12": { "name": "punctuation.section.optional.end.latex" }
+						"3": { "name": "keyword.operator.modifier.star.latex" }
 					},
 					"end": "(?<=\\})(?!\\s*\\{)",
 					"patterns": [
+						{ "include": "#latex-environment-definition-header" },
 						{ "include": "#latex-environment-definition-body" }
 					]
 				},
