@@ -310,41 +310,11 @@
 				}
 			]
 		},
-		"latex-environment-definition-begin-body": {
+		"latex-environment-definition-body": {
 			"patterns": [
 				{
-					"name": "meta.definition.environment.begin-body.latex",
-					"begin": "(\\{)(?=[\\s\\S]*\\}\\s*\\{)",
-					"beginCaptures": {
-						"1": { "name": "punctuation.definition.group.begin.latex" }
-					},
-					"end": "(\\})(?=\\s*\\{)",
-					"endCaptures": {
-						"1": { "name": "punctuation.definition.group.end.latex" }
-					},
-					"contentName": "meta.definition.environment.body.content.latex",
-					"patterns": [
-						{ "include": "#latex-balanced-text-group" },
-						{ "include": "#latex-core-commands" },
-						{ "include": "#latex-references" },
-						{ "include": "#latex-escaped-specials" },
-						{ "include": "#expl3-definition-forms" },
-						{ "include": "#expl3-kernel-families" },
-						{ "include": "#expl3-control-families" },
-						{ "include": "#expl3-special-forms" },
-						{ "include": "#expl3-functions" },
-						{ "include": "#expl3-variables" },
-						{ "include": "#tex-parameter-placeholders" },
-						{ "include": "generic-commands" }
-					]
-				}
-			]
-		},
-		"latex-environment-definition-end-body": {
-			"patterns": [
-				{
-					"name": "meta.definition.environment.end-body.latex",
-					"begin": "(\\{)(?![\\s\\S]*\\}\\s*\\{)",
+					"name": "meta.definition.environment.body.latex",
+					"begin": "(\\{)",
 					"beginCaptures": {
 						"1": { "name": "punctuation.definition.group.begin.latex" }
 					},
@@ -566,8 +536,7 @@
 					"end": "(?<=\\})(?!\\s*\\{)",
 					"patterns": [
 						{ "include": "#latex-environment-definition-header" },
-						{ "include": "#latex-environment-definition-begin-body" },
-						{ "include": "#latex-environment-definition-end-body" }
+						{ "include": "#latex-environment-definition-body" }
 					]
 				},
 				{
