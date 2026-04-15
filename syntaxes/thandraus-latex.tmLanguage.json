@@ -310,21 +310,22 @@
 				}
 			]
 		},
-		"latex-environment-definition-body": {
+		"latex-environment-definition-begin-body": {
 			"patterns": [
 				{
-					"name": "meta.definition.environment.body.latex",
+					"name": "meta.definition.environment.begin-body.latex",
 					"begin": "(\\{)",
 					"beginCaptures": {
 						"1": { "name": "punctuation.definition.group.begin.latex" }
 					},
-					"end": "(\\})",
-					"endCaptures": { 
+					"end": "(\\})(?=\\s*\\{)",
+					"endCaptures": {
 						"1": { "name": "punctuation.definition.group.end.latex" }
 					},
 					"contentName": "meta.definition.environment.body.content.latex",
 					"patterns": [
-						{ "include": "#latex-environment-definition-body" },
+						{ "include": "#latex-environment-definition-begin-body" },
+						{ "include": "#latex-balanced-text-group" },
 						{ "include": "#latex-core-commands" },
 						{ "include": "#latex-references" },
 						{ "include": "#latex-escaped-specials" },
@@ -334,7 +335,38 @@
 						{ "include": "#expl3-special-forms" },
 						{ "include": "#expl3-functions" },
 						{ "include": "#expl3-variables" },
-						{ "include": "#tex-parameter-placeholders"},
+						{ "include": "#tex-parameter-placeholders" },
+						{ "include": "generic-commands" }
+					]
+				}
+			]
+		},
+		"latex-environment-definition-end-body": {
+			"patterns": [
+				{
+					"name": "meta.definition.environment.end-body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "meta.definition.environment.body.content.latex",
+					"patterns": [
+						{ "include": "#latex-environment-definition-end-body" },
+						{ "include": "#latex-balanced-text-group" },
+						{ "include": "#latex-core-commands" },
+						{ "include": "#latex-references" },
+						{ "include": "#latex-escaped-specials" },
+						{ "include": "#expl3-definition-forms" },
+						{ "include": "#expl3-kernel-families" },
+						{ "include": "#expl3-control-families" },
+						{ "include": "#expl3-special-forms" },
+						{ "include": "#expl3-functions" },
+						{ "include": "#expl3-variables" },
+						{ "include": "#tex-parameter-placeholders" },
 						{ "include": "#generic-commands" }
 					]
 				}
@@ -533,10 +565,11 @@
 						"2": { "name": "support.function.definition.environment.latex" },
 						"3": { "name": "keyword.operator.modifier.star.latex" }
 					},
-					"end": "(?<=\\})(?!\\s*\\{)",
+					"end": "(?<=\\})",
 					"patterns": [
 						{ "include": "#latex-environment-definition-header" },
-						{ "include": "#latex-environment-definition-body" }
+						{ "include": "#latex-environment-definition-begin-body" },
+						{ "include": "#latex-environment-definition-end-body" }
 					]
 				},
 				{
