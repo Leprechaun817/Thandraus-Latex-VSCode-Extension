@@ -533,7 +533,7 @@
 						"2": { "name": "support.function.definition.environment.latex" },
 						"3": { "name": "keyword.operator.modifier.star.latex" }
 					},
-					"end": "(?<=\\})(?!\\s*\\{)",
+					"end": "^(?![ \\t]*\\{)",
 					"patterns": [
 						{ "include": "#latex-environment-definition-header" },
 						{ "include": "#latex-environment-definition-body" }
