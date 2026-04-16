@@ -717,20 +717,6 @@
 					}
 				},
 				{
-					"match": "(\\\\)(footnote|marginpar|url|href)",
-					"captures": {
-						"1": { "name": "punctuation.definition.command.latex" },
-						"2": { "name": "support.function.reference.latex" }
-					}
-				},
-				{
-					"match": "(\\\\)(emph|textbf|textit|texttt|underline)",
-					"captures": {
-						"1": { "name": "punctuation.definition.command.latex" },
-						"2": { "name": "support.function.formatting.latex" }
-					}
-				},
-				{
 					"match": "(\\\\)(frac|sqrt|left|right)",
 					"captures": {
 						"1": { "name": "punctuation.definition.command.latex" },
