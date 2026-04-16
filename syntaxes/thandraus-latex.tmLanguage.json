@@ -412,6 +412,118 @@
 				}
 			]
 		},
+		"latex-rich-text-body-patterns": {
+			"patterns": [
+				{ "include": "#latex-balanced-text-group" },
+				{ "include": "#latex-core-commands" },
+				{ "include": "#latex-references" },
+				{ "include": "#latex-escaped-specials" },
+				{ "include": "#expl3-definition-forms" },
+				{ "include": "#expl3-kernel-families" },
+				{ "include": "#expl3-control-families" },
+				{ "include": "#expl3-special-forms" },
+				{ "include": "#expl3-functions" },
+				{ "include": "#expl3-variables" },
+				{ "include": "#tex-parameter-placeholders" },
+				{ "include": "#generic-commands" }
+			]
+		},
+		"latex-footnote-body": {
+			"patterns": [
+				{
+					"name": "meta.annotation.footnote.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "meta.annotation.footnote.content.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" }
+					]
+				}
+			]
+		},
+		"latex-formatting-italic-body": {
+			"patterns": [
+				{
+					"name": "meta.formatting.italic.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "markup.italic.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" }
+					]
+				}
+			]
+		},
+		"latex-formatting-bold-body": {
+			"patterns": [
+				{
+					"name": "meta.formatting.bold.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "markup.bold.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" }
+					]
+				}
+			]
+		},
+		"latex-formatting-code-body": {
+			"patterns": [
+				{
+					"name": "meta.formatting.code.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "markup.raw.inline.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" }
+					]
+				}
+			]
+		},
+		"latex-formatting-underline-body": {
+			"patterns": [
+				{
+					"name": "meta.formatting.underline.body.latex",
+					"begin": "(\\{",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "markup.underline.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" }
+					]
+				
+				}
+			]
+		},
 		"latex-core-commands": {
 			"patterns": [
 				{
@@ -444,17 +556,16 @@
 				},
 				{
 					"name": "meta.reference.href.latex",
-					"match": "(\\\\)(href)(\\{)((?:[^{}]|\\{[^{}]*\\})*)(\\})(\\{)((?:[^{}]|\\{[^{}]*\\})*)(\\})",
-					"captures": {
+					"begin": "(\\\\)(href)(?=\\s*\\{)",
+					"beginCaptures": {
 						"1": { "name": "punctuation.definition.command.latex" },
-						"2": { "name": "support.function.reference.latex" },
-						"3": { "name": "punctuation.definition.group.begin.latex" },
-						"4": { "name": "markup.underline.link.latex" },
-						"5": { "name": "punctuation.definition.group.end.latex" },
-						"6": { "name": "punctuation.definition.group.begin.latex" },
-						"7": { "name": "string.other.link-title.latex" },
-						"8": { "name": "punctuation.definition.group.end.latex" }
-					}
+						"2": { "name": "support.function.reference.latex" }
+					},
+					"end": "(?<=\\})(?!\\s*\\{)",
+					"patterns": [
+						{ "include": "#latex-href-url-arg" },
+						{ "include": "#latex-href-text-arg" }
+					]
 				},
 				{
 					"name": "meta.annotation.footnote.latex",
@@ -463,22 +574,72 @@
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.reference.latex" }
 					},
-					"end": "(?<=\\})(?=\\s*(?:[^\\{]|$))",
+					"end": "(?<=\\})",
 					"patterns": [
-						{ "include": "#latex-balanced-text-group" }
+						{ "include": "#latex-footnote-body" }
 					]
 				},
 				{
-					"name": "meta.formatting.inline.latex",
-					"begin": "(\\\\)(emph|textbf|textit|texttt|underline)(?=\\s*\\{)",
+					"name": "meta.formatting.italic.latex",
+					"begin": "(\\\\)(emph|textit)(?=\\s*\\{)",
 					"beginCaptures": {
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.formatting.latex" }
 					},
-					"end": "(?<=\\})(?=\\s*(?:[^\\{]|$))",
+					"end": "(?<=\\})",
 					"patterns": [
-						{ "include": "#latex-balanced-text-group" }
+						{ "include": "#latex-formatting-italic-body" }
 					]
+				},
+				{
+					"name": "meta.formatting.bold.latex",
+					"begin": "(\\\\)(textbf)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.formatting.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#latex-formatting-bold-body" }
+					]
+				},
+				{
+					"name": "meta.formatting.code.latex",
+					"begin": "(\\\\)(texttt)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.formatting.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#latex-formatting-code-body" }
+					]
+				},
+				{
+					"name": "meta.formatting.underline.latex",
+					"begin": "(\\\\)(underline)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.formatting.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#latex-formatting-underline-body"}
+					]
+				},
+				{
+					"match": "(\\\\)(footnote|marginpar|url|href)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.reference.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(emph|textbf|textit|texttt|underline)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.formatting.latex" }
+					}
 				},
 				{
 					"match": "(\\\\)(input|include)",
@@ -582,6 +743,46 @@
 				{
 					"match": "\\\\[%#$&{}_]",
 					"name": "constant.character.escape.latex"
+				}
+			]
+		},
+		"latex-href-url-arg": {
+			"patterns": [
+				{
+					"name": "meta.reference.href.url-arg.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "markup.underline.link.latex",
+					"patterns": [
+						{ "include": "#latex-balanced-text-group" },
+						{ "include": "#latex-escaped-specials" },
+						{ "include": "#generic-commands" }
+					]
+				}
+			]
+		},
+		"latex-href-text-arg": {
+			"patterns": [
+				{
+					"name": "meta.reference.href.text-arg.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "string.other.link-title.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" }
+					]
 				}
 			]
 		},
