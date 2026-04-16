@@ -751,7 +751,7 @@
 			"patterns": [
 				{
 					"name": "meta.reference.href.url-arg.latex",
-					"begin": "(\\{)",
+					"begin": "\\s*(\\{)",
 					"beginCaptures": {
 						"1": { "name": "punctuation.definition.group.begin.latex" }
 					},
@@ -768,11 +768,30 @@
 				}
 			]
 		},
-		"latex-href-text-arg": {
+		"latex-href-text-arg-inline": {
 			"patterns": [
 				{
 					"name": "meta.reference.href.text-arg.latex",
-					"begin": "(\\{)",
+					"begin": "(?<=\\})\\s*(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "string.other.link-title.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" }
+					]
+				}
+			]
+		},
+		"latex-href-text-arg-nextline": {
+			"patterns": [
+				{
+					"name": "meta.reference.href.text-arg.latex",
+					"begin": "^[ \\t]*(\\{)",
 					"beginCaptures": {
 						"1": { "name": "punctuation.definition.group.begin.latex" }
 					},
