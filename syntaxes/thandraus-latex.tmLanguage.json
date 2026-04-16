@@ -564,7 +564,7 @@
 					"end": "^(?![ \\t]*\\{)",
 					"patterns": [
 						{ "include": "#latex-href-text-arg-inline" },
-						{ "include": "#latex-href-text-nextline" },
+						{ "include": "#latex-href-text-arg-nextline" },
 						{ "include": "#latex-href-url-arg"}
 					]
 				},
