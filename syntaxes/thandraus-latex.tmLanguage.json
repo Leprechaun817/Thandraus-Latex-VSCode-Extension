@@ -40,8 +40,19 @@
 					"end": "\\\\end\\{(?:verbatim\\*?|lstlisting|minted)\\}"
 				},
 				{
-					"name": "text.verbatim.inline.latex",
-					"match": "\\\\verb\\*?(.)[^\\1]*\\1"
+					"name": "meta.verbatim.inline.latex",
+					"begin": "(\\\\)(verb)(\\*?)([^A-Za-z*\\s])",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.general.latex" },
+						"3": { "name": "keyword.operator.modifier.star.latex" },
+						"4": { "name": "punctuation.definition.verbatim.begin.latex" }
+					},
+					"end": "(\\4)|$",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.verbatim.end.latex" }
+					},
+					"contentName": "text.verbatim.inline.latex"
 				}
 			]
 		},
