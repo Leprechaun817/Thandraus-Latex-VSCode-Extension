@@ -556,15 +556,16 @@
 				},
 				{
 					"name": "meta.reference.href.latex",
-					"begin": "(\\\\)(href)(?=\\s*\\{)",
+					"begin": "(\\\\)(href)",
 					"beginCaptures": {
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.reference.latex" }
 					},
-					"end": "(?<=\\})(?!\\s*\\{)",
+					"end": "^(?![ \\t]*\\{)",
 					"patterns": [
-						{ "include": "#latex-href-url-arg" },
-						{ "include": "#latex-href-text-arg" }
+						{ "include": "#latex-href-text-arg-inline" },
+						{ "include": "#latex-href-text-nextline" },
+						{ "include": "#latex-href-url-arg"}
 					]
 				},
 				{
