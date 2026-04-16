@@ -508,7 +508,7 @@
 			"patterns": [
 				{
 					"name": "meta.formatting.underline.body.latex",
-					"begin": "(\\{",
+					"begin": "(\\{)",
 					"beginCaptures": {
 						"1": { "name": "punctuation.definition.group.begin.latex" }
 					},
