@@ -2,7 +2,7 @@
 	"name": "thandraus-latex",
 	"displayName": "Thandraus LaTeX Syntax",
 	"description": "Custom TeX/LaTeX + expl3 + codex-aware syntax highlighting for VS Code.",
-	"version": "0.0.8",
+	"version": "0.0.14",
 	"publisher": "Leprechaun817",
 	"engines": {
 		"vscode": "^1.97.0"
