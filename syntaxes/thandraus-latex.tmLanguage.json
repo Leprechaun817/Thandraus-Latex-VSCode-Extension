@@ -6,6 +6,7 @@
 		{ "include": "#verbatim" },
 		{ "include": "#math-display" },
 		{ "include": "#math-inline" },
+		{ "include": "#codex-environments" },
 		{ "include": "#environments" },
 		{ "include": "#latex-preamble" },
 		{ "include": "#latex-structure" },
@@ -18,6 +19,10 @@
 		{ "include": "#expl3-special-forms" },
 		{ "include": "#expl3-functions" },
 		{ "include": "#expl3-variables" },
+		{ "include": "#codex-header-interface" },
+		{ "include": "#codex-title-elements" },
+		{ "include": "#codex-body-interface" },
+		{ "include": "#codex-counter-interface" },
 		{ "include": "#codex-commands" },
 		{ "include": "#tex-parameter-placeholders" },
 		{ "include": "#generic-commands" },
@@ -121,6 +126,20 @@
 						{ "include": "#tex-parameter-placeholders" },
 						{ "include": "#generic-commands" }
 					]
+				}
+			]
+		},
+		"codex-environments": {
+			"patterns": [
+				{
+					"match": "(\\\\)(begin|end)(\\{)(codexfrontmatter|envcodexheader)(\\})",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.environment.codex.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" },
+						"4": { "name": "entity.name.environment.codex.latex" },
+						"5": { "name": "punctuation.definition.group.end.latex" }
+					}
 				}
 			]
 		},
@@ -981,6 +1000,198 @@
 				{
 					"match": "\\\\(?:q|s)_[A-Za-z@]+(?:_[A-Za-z@]+)*",
 					"name": "constant.language.expl3.special.latex"				
+				}
+			]
+		},
+		"codex-header-interface": {
+			"patterns": [
+				{
+					"match": "\\\\(SetCodexHeader)\\b",
+					"captures": {
+						"1": { "name": "support.function.codex.header.builder.latex" }
+					}
+				},
+				{
+					"match": "\\\\(shortcodexheader|canonicalcodexheader)\\b",
+					"captures": {
+						"1": { "name": "support.function.codex.header.renderer.latex" }
+					}
+				}
+			]
+		},
+		"codex-title-elements": {
+			"patterns": [
+				{
+					"name": "meta.codex.title-element.title.latex",
+					"begin": "(\\\\)(TitleElementTitle)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.codex.header.title.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#codex-title-element-title-body" }
+					]
+				},
+				{
+					"name": "meta.codex.title-element.metadata.latex",
+					"begin": "(\\\\)(TitleElementAuthority|TitleElementCodexCollection|TitleElementDesignation|TitleElementDocumentClass|TitleElementDocumentNumber|TitleElementRevisionKind|TitleElementRevisionID)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.codex.header.metadata.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#codex-title-element-metadata-body" }
+					]
+				}
+			]
+		},
+		"codex-title-element-title-body": {
+			"patterns": [
+				{
+					"name": "meta.codex.title-element.title.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "entity.name.codex.title.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" },
+						{ "include": "#tex-parameter-placeholders" }
+					]
+				}
+			]
+		},
+		"codex-title-element-metadata-body": {
+			"patterns": [
+				{
+					"name": "meta.codex.title-element.metadata.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "string.unquoted.codex.metadata.latex",
+					"patterns": [
+						{ "include": "#latex-escaped-specials" },
+						{ "include": "#generic-commands" }
+					]
+				}
+			]
+		},
+		"codex-body-interface": {
+			"patterns": [
+				{
+					"name": "meta.codex.section.latex",
+					"begin": "(\\\\)(codexsection)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.codex.structure.section.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#codex-section-title-body" }
+					]
+				},
+				{
+					"name": "meta.codex.subsection.latex",
+					"begin": "(\\\\)(codexsubsection)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.codex.structure.subsection.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#codex-subsection-title-body" }
+					]
+				},
+				{
+					"name": "meta.codex.subsubsection.latex",
+					"begin": "(\\\\)(codexsubsubsection)(?=\\s*\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.codex.structure.subsubsection.latex" }
+					},
+					"end": "(?<=\\})",
+					"patterns": [
+						{ "include": "#codex-subsubsection-title-body" }
+					]
+				}
+			]
+		},
+		"codex-section-title-body": {
+			"patterns": [
+				{
+					"name": "meta.codex.section.title.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "entity.name.section.codex.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" },
+						{ "include": "#tex-parameter-placeholders" }
+					]
+				}
+			]
+		},
+		"codex-subsection-title-body": {
+			"patterns": [
+				{
+					"name": "meta.codex.subsection.title.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "entity.name.subsection.codex.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" },
+						{ "include": "#tex-parameter-placeholders"}
+					]
+				}
+			]
+		},
+		"codex-subsubsection-title-body": {
+			"patterns": [
+				{
+					"name": "meta.codex.subsubsection.title.body.latex",
+					"begin": "(\\{)",
+					"beginCaptures": {
+						"1": { "name": "punctuation.definition.group.begin.latex" }
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"1": { "name": "punctuation.definition.group.end.latex" }
+					},
+					"contentName": "entity.name.subsubsection.codex.latex",
+					"patterns": [
+						{ "include": "#latex-rich-text-body-patterns" },
+						{ "include": "#tex-parameter-placeholders" }
+					]
+				}
+			]
+		},
+		"codex-counter-interface": {
+			"patterns": [
+				{
+					"match": "\\\\(?:SetSectionSegmentCntr|SetSubSectionSegmentCntr|SetSubSubSectionSegmentCntr|ResetAllSectionSegmentCntrs|ResetSubSectionSegmentCntr|ResetSubSubSectionSegmentCntr|SectionSegmentRomanNumUC|SectionSegmentRomanNumLC|SubSecNum)\\b",
+					"name": "support.function.codex.counter.latex"
 				}
 			]
 		},
