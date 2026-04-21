@@ -1200,12 +1200,12 @@
 		"codex-commands": {
 			"patterns": [
 				{
-					"match": "\\\\(?:SetCodexHeader|CodexSection|CodexSubsection|CodexAbstract|CodexFrontmatter|CodexBodyOpen)\\b",
-					"name": "support.function.codex.structure.latex"
+					"match": "\\\\(?:SetCodexHeader|shortcodexheader|canonicalcodexheader|codexsection|codexsubsection|codexsubsubsection)\\b",
+					"name": "support.function.codex.fallback.latex"
 				},
 				{
 					"match": "\\\\(?:TitleElementAuthority|TitleElementCodexCollection|TitleElementDesignation|TitleElementDocumentClass|TitleElementDocumentNumber|TitleElementRevisionKind|TitleElementRevisionID|TitleElementTitle)\\b",
-					"name": "support.function.codex.header.latex"
+					"name": "support.function.codex.fallback.latex"
 				}
 			]
 		},
