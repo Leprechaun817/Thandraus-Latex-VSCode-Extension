@@ -132,12 +132,32 @@
 		"codex-environments": {
 			"patterns": [
 				{
-					"match": "(\\\\)(begin|end)(\\{)(codexfrontmatter|envcodexheader)(\\})",
+					"match": "(\\\\)(begin|end)(\\{)(codexfrontmatter|codexmainmatter|codexbackmatter)(\\})",
 					"captures": {
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.environment.codex.latex" },
 						"3": { "name": "punctuation.definition.group.begin.latex" },
-						"4": { "name": "entity.name.environment.codex.latex" },
+						"4": { "name": "entity.name.environment.codex.container.latex" },
+						"5": { "name": "punctuation.definition.group.end.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(begin|end)(\\{)(envcodexheader|envcodexabstract|envcodexattribution|envcodexbodyopening)(\\})",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.environment.codex.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" },
+						"4": { "name": "entity.name.environment.codex.segment.latex" },
+						"5": { "name": "punctuation.definition.group.end.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(begin|end)(\\{)(codex[a-z]+matter|envcodex[a-z]+)(\\})",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.environment.codex.latex" },
+						"3": { "name": "punctuation.definition.group.begin.latex" },
+						"4": { "name": "entity.name.environment.codex.future.latex" },
 						"5": { "name": "punctuation.definition.group.end.latex" }
 					}
 				}
