@@ -1061,8 +1061,7 @@
 					},
 					"contentName": "entity.name.codex.title.latex",
 					"patterns": [
-						{ "include": "#latex-rich-text-body-patterns" },
-						{ "include": "#tex-parameter-placeholders" }
+						{ "include": "#codex-rich-text-body-patterns" }
 					]
 				}
 			]
@@ -1085,6 +1084,12 @@
 						{ "include": "#generic-commands" }
 					]
 				}
+			]
+		},
+		"codex-rich-text-body-patterns": {
+			"patterns": [
+				{ "include": "#latex-rich-text-body-patterns" },
+				{ "include": "#tex-parameter-placeholders" }
 			]
 		},
 		"codex-body-interface": {
@@ -1141,8 +1146,7 @@
 					},
 					"contentName": "entity.name.section.codex.latex",
 					"patterns": [
-						{ "include": "#latex-rich-text-body-patterns" },
-						{ "include": "#tex-parameter-placeholders" }
+						{ "include": "#codex-rich-text-body-patterns" }
 					]
 				}
 			]
@@ -1161,8 +1165,7 @@
 					},
 					"contentName": "entity.name.subsection.codex.latex",
 					"patterns": [
-						{ "include": "#latex-rich-text-body-patterns" },
-						{ "include": "#tex-parameter-placeholders"}
+						{ "include": "#codex-rich-text-body-patterns" }
 					]
 				}
 			]
@@ -1181,8 +1184,7 @@
 					},
 					"contentName": "entity.name.subsubsection.codex.latex",
 					"patterns": [
-						{ "include": "#latex-rich-text-body-patterns" },
-						{ "include": "#tex-parameter-placeholders" }
+						{ "include": "#codex-rich-text-body-patterns" }
 					]
 				}
 			]
