@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-const THANDRAUS_LATEX_LANGUAGE_ID = 'thandraus-latex';
+const THANDRAUS_LATEX_LANGUAGE_ID = 'latex';
 
 const TOKEN_TYPES = [
 	'namespace',
@@ -212,7 +212,7 @@ class GeometrySemanticTokensProvider implements vscode.DocumentSemanticTokensPro
 }
 
 function scanGeometryCommands(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string) : void {
-	const commandRegex = /\\(geometry|newgeometry|restoregeometry|savegeomemtry|loadgeometry)\b/g;
+	const commandRegex = /\\(geometry|newgeometry|restoregeometry|savegeometry|loadgeometry)\b/g;
 
 	for(const match of text.matchAll(commandRegex)) {
 		const fullMatch = match[0];
