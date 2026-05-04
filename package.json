@@ -2,8 +2,12 @@
 	"name": "thandraus-latex",
 	"displayName": "Thandraus LaTeX Syntax",
 	"description": "Custom TeX/LaTeX + expl3 + codex-aware syntax highlighting for VS Code.",
-	"version": "0.0.14",
+	"version": "0.1.1",
 	"publisher": "Leprechaun817",
+	"main": "./out/extension.js",
+	"activationEvents": [
+		"onLanguage:latex"
+	],
 	"engines": {
 		"vscode": "^1.97.0"
 	},
@@ -28,6 +32,108 @@
 				"unbalancedBracketScopes": ["comment.line.percentage.latex",
 											"text.verbatim.latex"]
 			}
-		]
+		],
+		"semanticTokenTypes": [
+			{
+				"id": "geometryCommand",
+				"superType": "macro",
+				"description": "A command provided by the geometry package."
+			},
+			{
+				"id": "geometryKey",
+				"superType": "property",
+				"description": "A key inside a geometry option list."
+			},
+			{
+				"id": "geometryPreset",
+				"superType": "enumMember",
+				"description": "A preset paper or layout name inside a geometry list."
+			}
+		],
+		"semanticTokenModifiers": [
+			{
+				"id": "packageProvided",
+				"description": "Resolved from a package visibly loaded in the current document."
+			},
+			{
+				"id": "paper",
+				"description": "Paper-size or paper-orientation related."
+			},
+			{
+				"id": "layout",
+				"description": "Layout-area related."
+			},
+			{
+				"id": "margin",
+				"description": "Margin or body-partition related."
+			},
+			{
+				"id": "ratio",
+				"description": "Margin-ratio related."
+			},
+			{
+				"id": "boolean",
+				"description": "A boolean geometry option."			
+			},
+			{
+				"id": "restrictedInNewgeometry",
+				"description": "Not available in \\newgeometry according to the geometry manual."
+			}
+		],
+		"semanticTokenScopes": [
+			{
+				"language": "latex",
+				"scopes": {
+					"geometryCommand": [
+						"support.function.geometry.latex"
+					],
+					"geometryKey": [
+						"variable.other.geometry.key.latex"
+					],
+					"geometryKey.paper": [
+						"variable.other.geometry.key.paper.latex"
+					],
+					"geometryKey.layout": [
+						"variable.other.geometry.key.layout.latex"
+					],
+					"geometryKey.margin": [
+						"variable.other.geometry.key.margin.latex"
+					],
+					"geometryKey.ratio": [
+						"variable.other.geometry.key.ratio.latex"
+					],
+					"geometryKey.boolean": [
+						"variable.other.geometry.key.boolean.latex"
+					],
+					"geometryKey.restrictedInNewgeometry": [
+						"invalid.deprecated.geometry.key.latex"
+					],
+					"geometryPreset": [
+						"constant.language.geometry.preset.latex"
+					],
+					"geometryPreset.paper": [
+						"constant.language.geometry.preset.paper.latex"
+					],
+					"geometryPreset.restrictedInNewgeometry": [
+						"invalid.deprecated.geometry.preset.latex"
+					]
+				}
+			}
+		],
+		"configurationDefaults": {
+			"[latex]": {
+				"editor.semanticHighlighting.enabled": true
+			}
+		}
+	},
+	"scripts": {
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"vscode:prepublish": "npm run compile"
+	},
+	"devDependencies": {
+		"@types/node": "^20.12.12",
+		"@types/vscode": "^1.97.0",
+		"typescript": "^5.4.5"
 	}
 }
