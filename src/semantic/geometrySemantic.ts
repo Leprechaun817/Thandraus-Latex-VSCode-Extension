@@ -232,7 +232,7 @@ function scanGeometryCommands(document: vscode.TextDocument, builder: vscode.Sem
 			continue;
 		}
 
-		const region = readBalanced(text, cursor, '{', '}')l
+		const region = readBalanced(text, cursor, '{', '}');
 		if(!region) {
 			continue;
 		}
