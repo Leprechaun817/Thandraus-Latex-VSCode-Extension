@@ -451,23 +451,80 @@ function splitTopLevel(text: string, start: number, end: number, separator: stri
 }
 
 function findTopLevelChar(text: string, start: number, end: number, target: string) : number {
+	let braceDepth = 0;
+	let bracketDepth = 0;
+	let parenDepth = 0;
+
+	for(let i = start; i < end; i++) {
+		const ch = text[i];
+		if(ch === '\\') {
+			i += 1;
+			continue;
+		}
+
+		if(ch === '{') {
+			braceDepth += 1;
+		}
+		else if(ch === '}') {
+			braceDepth = Math.max(0, braceDepth - 1);
+		}
+		else if(ch === '[') {
+			bracketDepth += 1;
+		}
+		else if(ch === ']') {
+			bracketDepth = Math.max(0, bracketDepth - 1);
+		}
+		else if(ch === '(') {
+			parenDepth += 1;
+		}
+		else if(ch === ')') {
+			parenDepth = Math.max(0, parenDepth - 1)
+		}
+		else if(ch === target && braceDepth === 0 && bracketDepth === 0 && parenDepth === 0) {
+			return i;
+		}
+	}
 
 	return -1;
 }
 
 function trimSlice(text: string, start: number, end: number) : TextSlice | null {
+	while(start < end && /\s/.test(text[start])) {
+		start += 1;
+	}
 
-	return null;
+	while(end > start && /\s/.test(text[end - 1])) {
+		end -= 1;
+	}
+
+	if(start >= end) {
+		return null;
+	}
+
+	return {start, end};
 }
 
 function skipWhitespace(text: string, offset: number) : number {
 	let i = offset;
+	while(i < text.length && /\s/.test(text[i])) {
+		i += 1;
+	}
 
 	return i;
 }
 
 function uniqueModifiers(modifiers: readonly GeometryModifier[]) : GeometryModifier[] {
+	const seen = new Set<GeometryModifier>();
 	const result: GeometryModifier[] = [];
+
+	for(const modifier of modifiers) {
+		if(seen.has(modifier)) {
+			continue;
+		}
+
+		seen.add(modifier);
+		result.push(modifier);
+	}
 
 	return result;
 }
