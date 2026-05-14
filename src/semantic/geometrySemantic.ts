@@ -693,7 +693,7 @@ function collectVerbatimEnvironmentRanges(text: string, ranges: TextSlice[]) : v
 		}
 
 		const environmentName = match[1];
-		const endRegex = new RegExp(`\\\\end\\{$escapeRegExp(enivronmentName)}\\}`, 'g');
+		const endRegex = new RegExp(`\\\\end\\{${escapeRegExp(environmentName)}\\}`, 'g');
 		endRegex.lastIndex = start + match[0].length;
 
 		const endMatch = endRegex.exec(text);
