@@ -20,7 +20,10 @@ const TOKEN_MODIFIERS = [
 	'restrictedInNewgeometry',
 	'length',
 	'wildcard',
-	'listValue'
+	'listValue',
+	'number',
+	'integer',
+	'driver'
 ] as const;
 
 type GeometryTokenType = (typeof TOKEN_TYPES)[number];
@@ -237,6 +240,23 @@ const GEOMETRY_PRESETS = new Map<string, readonly GeometryModifier[]>([
 
 const PRESET_VALUE_KEYS = new Set(['paper', 'layout']);
 
+const NUMERIC_VALUE_KEYS = new Set(['hscale', 'vscale', 'scale']);
+const INTEGER_VALUE_KEYS = new Set(['lines', 'mag']);
+const DRIVER_VALUE_KEYS = new Set(['driver']);
+
+const GEOMETRY_DRIVER_VALUES = new Set([
+	'auto',
+	'none',
+	'dvips',
+	'dvipdfm',
+	'dvipdfmx',
+	'xdvipdfmx',
+	'pdftex',
+	'luatex',
+	'xetex',
+	'vtex'
+]);
+
 const RESTRICTED_IN_NEWGEOMETRY_KEYS = new Set([
 	//Paper size / orientation
 	'paper',
@@ -397,7 +417,7 @@ function parseGeometryOptionList(document: vscode.TextDocument, builder: vscode.
 			emitGeometryPreset(document, builder, valueSlice.start, valueSlice.end, value, context, restrictThisOccurrence, ignoredRanges);
 		}
 
-		parseGeometryValue(document, builder, text, valueSlice.start, valueSlice.end, ignoredRanges);
+		parseGeometryValue(document, builder, text, valueSlice.start, valueSlice.end, key, ignoredRanges);
 	}
 }
 
@@ -476,7 +496,7 @@ function scanPackageInvocations(text: string, ignoredRanges: readonly TextSlice[
 	return results;
 }
 
-function parseGeometryValue(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, start: number, end: number, ignoredRanges: readonly TextSlice[]) : void {
+function parseGeometryValue(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, start: number, end: number, key: string, ignoredRanges: readonly TextSlice[]) : void {
 	const trimmed = trimSlice(text, start, end);
 	if(!trimmed || rangeIntersectsIgnored(trimmed.start, trimmed.end, ignoredRanges)) {
 		return;
@@ -490,17 +510,17 @@ function parseGeometryValue(document: vscode.TextDocument, builder: vscode.Seman
 				continue;
 			}
 
-			emitGeometryValue(document, builder, text, itemTrimmed.start, itemTrimmed.end, ['listValue'], ignoredRanges);
+			emitGeometryValue(document, builder, text, itemTrimmed.start, itemTrimmed.end, key, ['listValue'], ignoredRanges);
 		}
 		return;
 	}
 
-	emitGeometryValue(document, builder, text, trimmed.start, trimmed.end, [], ignoredRanges);
+	emitGeometryValue(document, builder, text, trimmed.start, trimmed.end, key, [], ignoredRanges);
 }
 
-function emitGeometryValue(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, start: number, end: number, extraModifiers: readonly GeometryModifier[], ignoredRanges: readonly TextSlice[]) : void {
+function emitGeometryValue(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, start: number, end: number, key: string, extraModifiers: readonly GeometryModifier[], ignoredRanges: readonly TextSlice[]) : void {
 	const rawValue = text.slice(start, end).trim();
-	const valueModifiers = classifyGeometryValue(rawValue);
+	const valueModifiers = classifyGeometryValue(rawValue, key);
 
 	if(!valueModifiers) {
 		return;
@@ -511,7 +531,7 @@ function emitGeometryValue(document: vscode.TextDocument, builder: vscode.Semant
 	pushTokenByOffsets(builder, document, start, end, 'geometryValue', uniqueModifiers(modifiers), ignoredRanges);
 }
 
-function classifyGeometryValue(rawValue: string) : GeometryModifier[] | null {
+function classifyGeometryValue(rawValue: string, key: string) : GeometryModifier[] | null {
 	const value = rawValue.trim().toLowerCase();
 	if(!value) {
 		return null;
@@ -522,6 +542,15 @@ function classifyGeometryValue(rawValue: string) : GeometryModifier[] | null {
 	}
 	if(value === 'true' || value === 'false') {
 		return ['boolean'];
+	}
+	if(DRIVER_VALUE_KEYS.has(key) && GEOMETRY_DRIVER_VALUES.has(value)) {
+		return ['driver'];
+	}
+	if(INTEGER_VALUE_KEYS.has(key) && /^[+-]?\d+$/.test(value)) {
+		return ['integer'];
+	}
+	if(NUMERIC_VALUE_KEYS.has(key) && /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value)) {
+		return ['number'];
 	}
 	if(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)\s*:\s*[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value)) {
 		return ['ratio'];
