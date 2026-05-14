@@ -183,7 +183,7 @@ const GEOMETRY_KEYS = new Map<string, readonly GeometryModifier[]>([
 	['verbose', ['boolean']],
 	['reset', ['boolean']],
 	['resetpaper', ['boolean']],
-	['map', []],
+	['mag', []],
 	['truedimen', ['boolean']],
 	['pass', ['boolean']],
 	['showframe', ['boolean']],
