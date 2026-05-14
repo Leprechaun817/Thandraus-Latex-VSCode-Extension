@@ -403,6 +403,11 @@ function parseGeometryOptionList(document: vscode.TextDocument, builder: vscode.
 		const rawKey = text.slice(keySlice.start, keySlice.end);
 		const key = rawKey.toLowerCase();
 
+		if(GEOMETRY_PRESETS.has(key)) {
+			emitGeometryPreset(document, builder, keySlice.start, keySlice.end, key, context, true, ignoredRanges);
+			continue;
+		}
+
 		emitGeometryKey(document, builder, keySlice.start, keySlice.end, key, context, ignoredRanges);
 
 		const valueSlice = trimSlice(text, equalsAt + 1, trimmed.end);
