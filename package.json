@@ -95,6 +95,18 @@
 			{
 				"id": "listValue",
 				"description": "A value inside a comma-separated geometry value list."
+			},
+			{
+				"id": "number",
+				"description": "A numeric geometry value."
+			},
+			{
+				"id": "integer",
+				"description": "A integer geometry value."
+			},
+			{
+				"id": "driver",
+				"description": "A geometry driver value."
 			}
 		],
 		"semanticTokenScopes": [
@@ -151,6 +163,15 @@
 					],
 					"geometryValue.listValue": [
 						"constant.other.geometry.value.list.latex"
+					],
+					"geometryValue.number": [
+						"constant.numeric.geometry.number.latex"
+					],
+					"geometryValue.integer": [
+						"constant.numeric.geometry.integer.latex"
+					],
+					"geometryValue.driver": [
+						"constant.language.geometry.driver.latex"
 					]
 
 				}
