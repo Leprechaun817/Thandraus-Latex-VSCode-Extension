@@ -6,7 +6,8 @@ const TOKEN_TYPES = [
 	'namespace',
 	'geometryCommand',
 	'geometryKey',
-	'geometryPreset'
+	'geometryPreset',
+	'geometryValue'
 ] as const;
 
 const TOKEN_MODIFIERS = [
@@ -16,7 +17,10 @@ const TOKEN_MODIFIERS = [
 	'margin',
 	'ratio',
 	'boolean',
-	'restrictedInNewgeometry'
+	'restrictedInNewgeometry',
+	'length',
+	'wildcard',
+	'listValue'
 ] as const;
 
 type GeometryTokenType = (typeof TOKEN_TYPES)[number];
@@ -176,7 +180,8 @@ class GeometrySemanticTokensProvider implements vscode.DocumentSemanticTokensPro
 	provideDocumentSemanticTokens(document: vscode.TextDocument) : vscode.ProviderResult<vscode.SemanticTokens> {
 		const text = document.getText();
 		const builder = new vscode.SemanticTokensBuilder(GEOMETRY_LEGEND);
-		const packageInvocations = scanPackageInvocations(text);
+		const ignoredRanges = collectIgnoredRanges(text);
+		const packageInvocations = scanPackageInvocations(text, ignoredRanges);
 
 		let geometryLoadedVisibly = false;
 
@@ -192,11 +197,11 @@ class GeometrySemanticTokensProvider implements vscode.DocumentSemanticTokensPro
 			geometryLoadedVisibly = true;
 
 			//Mark the package name itself
-			pushTokenByOffsets(builder, document, geometryPackage.start, geometryPackage.end, 'namespace');
+			pushTokenByOffsets(builder, document, geometryPackage.start, geometryPackage.end, 'namespace', [], ignoredRanges);
 
 			//Parse \usepackage[...]{geometry} / \RequirePackage[...]{geometry}
 			if(invocation.options) {
-				parseGeometryOptionList(document, builder, text, invocation.options.contentStart, invocation.options.contentEnd, 'usepackage');
+				parseGeometryOptionList(document, builder, text, invocation.options.contentStart, invocation.options.contentEnd, 'usepackage', ignoredRanges);
 			}
 		}
 
@@ -204,14 +209,14 @@ class GeometrySemanticTokensProvider implements vscode.DocumentSemanticTokensPro
 			return builder.build();
 		}
 
-		scanGeometryCommands(document, builder, text);
+		scanGeometryCommands(document, builder, text, ignoredRanges);
 
 
 		return builder.build();
 	}
 }
 
-function scanGeometryCommands(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string) : void {
+function scanGeometryCommands(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, ignoredRanges: readonly TextSlice[]) : void {
 	const commandRegex = /\\(geometry|newgeometry|restoregeometry|savegeometry|loadgeometry)\b/g;
 
 	for(const match of text.matchAll(commandRegex)) {
@@ -220,8 +225,12 @@ function scanGeometryCommands(document: vscode.TextDocument, builder: vscode.Sem
 		const start = match.index ?? 0;
 		const end = start + fullMatch.length;
 
+		if(rangeIntersectsIgnored(start, end, ignoredRanges)) {
+			continue;
+		}
+
 		const baseModifiers = GEOMETRY_COMMANDS.get(commandName) ?? ['packageProvided'];
-		pushTokenByOffsets(builder, document, start, end, 'geometryCommand', [...baseModifiers]);
+		pushTokenByOffsets(builder, document, start, end, 'geometryCommand', [...baseModifiers], ignoredRanges);
 
 		if(commandName !== 'geometry' && commandName !== 'newgeometry') {
 			continue;
@@ -237,14 +246,14 @@ function scanGeometryCommands(document: vscode.TextDocument, builder: vscode.Sem
 			continue;
 		}
 
-		parseGeometryOptionList(document, builder, text, region.contentStart, region.contentEnd, commandName === 'newgeometry' ? 'newgeometry' : 'geometry');
+		parseGeometryOptionList(document, builder, text, region.contentStart, region.contentEnd, commandName === 'newgeometry' ? 'newgeometry' : 'geometry', ignoredRanges);
 	}
 }
 
-function parseGeometryOptionList(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, start: number, end: number, context: GeometryContext) : void {
+function parseGeometryOptionList(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, start: number, end: number, context: GeometryContext, ignoredRanges: readonly TextSlice[]) : void {
 	for(const item of splitTopLevel(text, start, end, ',')) {
 		const trimmed = trimSlice(text, item.start, item.end);
-		if(!trimmed) {
+		if(!trimmed || rangeIntersectsIgnored(trimmed.start, trimmed.end, ignoredRanges)) {
 			continue;
 		}
 
@@ -254,12 +263,12 @@ function parseGeometryOptionList(document: vscode.TextDocument, builder: vscode.
 			const name = rawName.toLowerCase();
 
 			if(GEOMETRY_PRESETS.has(name)) {
-				emitGeometryPreset(document, builder, trimmed.start, trimmed.end, name, context, true);
+				emitGeometryPreset(document, builder, trimmed.start, trimmed.end, name, context, true, ignoredRanges);
 				continue;
 			}
 
 			if(GEOMETRY_KEYS.has(name)) {
-				emitGeometryKey(document, builder, trimmed.start, trimmed.end, name, context);
+				emitGeometryKey(document, builder, trimmed.start, trimmed.end, name, context, ignoredRanges);
 			}
 
 			continue;
@@ -273,7 +282,7 @@ function parseGeometryOptionList(document: vscode.TextDocument, builder: vscode.
 		const rawKey = text.slice(keySlice.start, keySlice.end);
 		const key = rawKey.toLowerCase();
 
-		emitGeometryKey(document, builder, keySlice.start, keySlice.end, key, context);
+		emitGeometryKey(document, builder, keySlice.start, keySlice.end, key, context, ignoredRanges);
 
 		const valueSlice = trimSlice(text, equalsAt + 1, trimmed.end);
 		if(!valueSlice) {
@@ -284,12 +293,14 @@ function parseGeometryOptionList(document: vscode.TextDocument, builder: vscode.
 		const value = rawValue.toLowerCase();
 		if(PRESET_VALUE_KEYS.has(key) && GEOMETRY_PRESETS.has(value)) {
 			const restrictThisOccurrence = context === 'newgeometry' && key === 'paper';
-			emitGeometryPreset(document, builder, valueSlice.start, valueSlice.end, value, context, restrictThisOccurrence);
+			emitGeometryPreset(document, builder, valueSlice.start, valueSlice.end, value, context, restrictThisOccurrence, ignoredRanges);
 		}
+
+		parseGeometryValue(document, builder, text, valueSlice.start, valueSlice.end, ignoredRanges);
 	}
 }
 
-function emitGeometryKey(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, start: number, end: number, key: string, context: GeometryContext) : void {
+function emitGeometryKey(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, start: number, end: number, key: string, context: GeometryContext, ignoredRanges: readonly TextSlice[]) : void {
 	const baseModifiers = GEOMETRY_KEYS.get(key);
 	if(!baseModifiers) {
 		return;
@@ -300,10 +311,10 @@ function emitGeometryKey(document: vscode.TextDocument, builder: vscode.Semantic
 		modifiers.push('restrictedInNewgeometry');
 	}
 
-	pushTokenByOffsets(builder, document, start, end, 'geometryKey', uniqueModifiers(modifiers));
+	pushTokenByOffsets(builder, document, start, end, 'geometryKey', uniqueModifiers(modifiers), ignoredRanges);
 }
 
-function emitGeometryPreset(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, start: number, end: number, preset: string, context: GeometryContext, restrictThisOccurrence: boolean) : void {
+function emitGeometryPreset(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, start: number, end: number, preset: string, context: GeometryContext, restrictThisOccurrence: boolean, ignoredRanges: readonly TextSlice[]) : void {
 	const baseModifiers = GEOMETRY_PRESETS.get(preset);
 	if(!baseModifiers) {
 		return;
@@ -314,17 +325,20 @@ function emitGeometryPreset(document: vscode.TextDocument, builder: vscode.Seman
 		modifiers.push('restrictedInNewgeometry');
 	}
 
-	pushTokenByOffsets(builder, document, start, end, 'geometryPreset', uniqueModifiers(modifiers));
+	pushTokenByOffsets(builder, document, start, end, 'geometryPreset', uniqueModifiers(modifiers), ignoredRanges);
 }
 
-function scanPackageInvocations(text: string) : PackageInvocation[] {
+function scanPackageInvocations(text: string, ignoredRanges: readonly TextSlice[]) : PackageInvocation[] {
 	const results: PackageInvocation[] = [];
 	
 	const commandRegex = /\\(?:usepackage|RequirePackage)\b/g;
 	for(const match of text.matchAll(commandRegex)) {
 		const commandStart = match.index ?? 0;
-		let cursor = skipWhitespace(text, commandStart + match[0].length);
+		if(offsetInRanges(commandStart, ignoredRanges)) {
+			continue;
+		}
 
+		let cursor = skipWhitespace(text, commandStart + match[0].length);
 		let options: BalancedRegion | undefined;
 		if(text[cursor] === '[') {
 			const parsed = readBalanced(text, cursor, '[', ']');
@@ -348,7 +362,7 @@ function scanPackageInvocations(text: string) : PackageInvocation[] {
 		const packages: PackageNameRange[] = [];
 		for(const pkgSlice of splitTopLevel(text, packageGroup.contentStart, packageGroup.contentEnd, ',')) {
 			const trimmed = trimSlice(text, pkgSlice.start, pkgSlice.end);
-			if(!trimmed) {
+			if(!trimmed || rangeIntersectsIgnored(trimmed.start, trimmed.end, ignoredRanges)) {
 				continue;
 			}
 
@@ -358,12 +372,91 @@ function scanPackageInvocations(text: string) : PackageInvocation[] {
 		results.push({commandStart, options, packageGroup, packages});
 	}
 
-
 	return results;
 }
 
-function pushTokenByOffsets(builder: vscode.SemanticTokensBuilder, document: vscode.TextDocument, start: number, end: number, tokenType: GeometryTokenType, tokenModifiers: readonly string[] = []) : void {
+function parseGeometryValue(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, start: number, end: number, ignoredRanges: readonly TextSlice[]) : void {
+	const trimmed = trimSlice(text, start, end);
+	if(!trimmed || rangeIntersectsIgnored(trimmed.start, trimmed.end, ignoredRanges)) {
+		return;
+	}
+
+	const wrapped = readBalanced(text, trimmed.start, '{', '}');
+	if(wrapped && wrapped.start === trimmed.start && wrapped.end + 1 === trimmed.end) {
+		for(const item of splitTopLevel(text, wrapped.contentStart, wrapped.contentEnd, ',')) {
+			const itemTrimmed = trimSlice(text, item.start, item.end);
+			if(!itemTrimmed || rangeIntersectsIgnored(itemTrimmed.start, itemTrimmed.end, ignoredRanges)) {
+				continue;
+			}
+
+			emitGeometryValue(document, builder, text, itemTrimmed.start, itemTrimmed.end, ['listValue'], ignoredRanges);
+		}
+		return;
+	}
+
+	emitGeometryValue(document, builder, text, trimmed.start, trimmed.end, [], ignoredRanges);
+}
+
+function emitGeometryValue(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, start: number, end: number, extraModifiers: readonly GeometryModifier[], ignoredRanges: readonly TextSlice[]) : void {
+	const rawValue = text.slice(start, end).trim();
+	const valueModifiers = classifyGeometryValue(rawValue);
+
+	if(!valueModifiers) {
+		return;
+	}
+
+	const modifiers: GeometryModifier[] = ['packageProvided', ...extraModifiers, ...valueModifiers];
+
+	pushTokenByOffsets(builder, document, start, end, 'geometryValue', uniqueModifiers(modifiers), ignoredRanges);
+}
+
+function classifyGeometryValue(rawValue: string) : GeometryModifier[] | null {
+	const value = rawValue.trim().toLowerCase();
+	if(!value) {
+		return null;
+	}
+
+	if(value === '*') {
+		return ['wildcard'];
+	}
+	if(value === 'true' || value === 'false') {
+		return ['boolean'];
+	}
+	if(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)\s*:\s*[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value)) {
+		return ['ratio'];
+	}
+	if(isGeometryLengthLikeValue(value)) {
+		return ['length'];
+	}
+
+	return null;
+}
+
+function isGeometryLengthLikeValue(value: string) : boolean {
+	//Examples: 1in, 2.5cm, .75in, -1pt
+	if(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)\s*(?:pt|bp|in|cm|mm|pc|dd|cc|sp|em|ex)$/.test(value)) {
+		return true;
+	}
+
+	//Examples: 0.8\paperwidth, .5\textheight
+	if(/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)\s*\\[A-Za-z@]+$/.test(value)) {
+		return true;
+	}
+
+	//Examples: \paperwidth, \textheight
+	if(/^\\[A-Za-z@]+$/.test(value)) {
+		return true;
+	}
+
+	return false;
+}
+
+function pushTokenByOffsets(builder: vscode.SemanticTokensBuilder, document: vscode.TextDocument, start: number, end: number, tokenType: GeometryTokenType, tokenModifiers: readonly string[] = [], ignoredRanges: readonly TextSlice[] = []) : void {
 	if(start >= end) {
+		return;
+	}
+
+	if(rangeIntersectsIgnored(start, end, ignoredRanges)) {
 		return;
 	}
 
@@ -527,5 +620,128 @@ function uniqueModifiers(modifiers: readonly GeometryModifier[]) : GeometryModif
 	}
 
 	return result;
+}
+
+function collectIgnoredRanges(text: string) : TextSlice[] {
+	const ranges: TextSlice[] = [];
+
+	collectLineCommentRanges(text, ranges);
+	collectVerbCommandRanges(text, ranges);
+	collectVerbatimEnvironmentRanges(text, ranges);
+
+	return mergeRanges(ranges);
+}
+
+function collectLineCommentRanges(text: string, ranges: TextSlice[]) : void {
+	let lineStart = 0;
+	while(lineStart < text.length) {
+		const newlineAt = text.indexOf('\n', lineStart);
+		const lineEnd = newlineAt === -1 ? text.length : newlineAt;
+
+		for(let i = lineStart; i < lineEnd; i++) {
+			if(text[i] === '%' && !isEscaped(text, i)) {
+				ranges.push({start: i, end: lineEnd});
+				break;
+			}
+		}
+
+		if(newlineAt === -1) {
+			break;
+		}
+
+		lineStart = newlineAt + 1;
+	}
+}
+
+function collectVerbCommandRanges(text: string, ranges: TextSlice[]) : void {
+	const verbRegex = /\\verb\*?/g;
+	for(const match of text.matchAll(verbRegex)) {
+		const start = match.index ?? 0;
+		if(offsetInRanges(start, ranges)) {
+			continue;
+		}
+
+		const delimiterIndex = start + match[0].length;
+		if(delimiterIndex >= text.length) {
+			continue;
+		}
+
+		const delimiter = text[delimiterIndex];
+		if(/\s/.test(delimiter)) {
+			continue;
+		}
+
+		const lineEndAt = text.indexOf('\n', delimiterIndex + 1);
+		const searchEnd = lineEndAt === -1 ? text.length : lineEndAt;
+		const closeAt = text.indexOf(delimiter, delimiterIndex + 1);
+
+		if(closeAt === -1 || closeAt > searchEnd) {
+			ranges.push({start, end: searchEnd});
+			continue;
+		}
+
+		ranges.push({start, end: closeAt + 1});
+	}
+}
+
+function collectVerbatimEnvironmentRanges(text: string, ranges: TextSlice[]) : void {
+	const beginRegex = /\\begin\{(verbatim\*?|Verbatim|lstlisting|minted|filecontents\*?)\}/g;
+	for(const match of text.matchAll(beginRegex)) {
+		const start = match.index ?? 0;
+		if(offsetInRanges(start, ranges)) {
+			continue;
+		}
+
+		const environmentName = match[1];
+		const endRegex = new RegExp(`\\\\end\\{$escapeRegExp(enivronmentName)}\\}`, 'g');
+		endRegex.lastIndex = start + match[0].length;
+
+		const endMatch = endRegex.exec(text);
+		const end = endMatch ? endMatch.index + endMatch[0].length : text.length;
+
+		ranges.push({start, end});
+	}
+}
+
+function isEscaped(text: string, offset: number) : boolean {
+	let slashCount = 0;
+	for(let i = offset - 1; i >= 0 && text[i] === '\\'; i--) {
+		slashCount += 1;
+	}
+
+	return slashCount % 2 === 1;
+}
+
+function offsetInRanges(offset: number, ranges: readonly TextSlice[]) : boolean {
+	return ranges.some((range) => offset >= range.start && offset < range.end);
+}
+
+function rangeIntersectsIgnored(start: number, end: number, ignoredRanges: readonly TextSlice[]) : boolean {
+	return ignoredRanges.some((range) => start < range.end && end > range.start);
+}
+
+function mergeRanges(ranges: readonly TextSlice[]) : TextSlice[] {
+	if(ranges.length === 0) {
+		return [];
+	}
+
+	const sorted = [...ranges].sort((a, b) => a.start - b.start);
+	const merged: TextSlice[] = [sorted[0]];
+
+	for(const range of sorted.slice(1)) {
+		const last = merged[merged.length - 1];
+		if(range.start <= last.end) {
+			last.end = Math.max(last.end, range.end);
+			continue;
+		}
+
+		merged.push({...range});
+	}
+
+	return merged;
+}
+
+function escapeRegExp(value: string) : string {
+	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
