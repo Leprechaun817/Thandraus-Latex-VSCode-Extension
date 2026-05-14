@@ -102,7 +102,7 @@
 			},
 			{
 				"id": "integer",
-				"description": "A integer geometry value."
+				"description": "An integer geometry value."
 			},
 			{
 				"id": "driver",
