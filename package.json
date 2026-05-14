@@ -48,6 +48,11 @@
 				"id": "geometryPreset",
 				"superType": "enumMember",
 				"description": "A preset paper or layout name inside a geometry list."
+			},
+			{
+				"id": "geometryValue",
+				"superType": "string",
+				"description": "A value inside a geometry option list."
 			}
 		],
 		"semanticTokenModifiers": [
@@ -78,6 +83,18 @@
 			{
 				"id": "restrictedInNewgeometry",
 				"description": "Not available in \\newgeometry according to the geometry manual."
+			},
+			{
+				"id": "length",
+				"description": "A geometry value representing a TeX length."
+			},
+			{
+				"id": "wildcard",
+				"description": "A wildcard geometry value such as *."
+			},
+			{
+				"id": "listValue",
+				"description": "A value inside a comma-separated geometry value list."
 			}
 		],
 		"semanticTokenScopes": [
@@ -116,7 +133,26 @@
 					],
 					"geometryPreset.restrictedInNewgeometry": [
 						"invalid.deprecated.geometry.preset.latex"
+					],
+					"geometryValue": [
+						"constant.other.geometry.value.latex"
+					],
+					"geometryValue.length": [
+						"constant.numeric.geometry.length.latex"
+					],
+					"geometryValue.ratio": [
+						"constant.numeric.geometry.ratio.latex"
+					],
+					"geometryValue.boolean": [
+						"constant.language.boolean.geometry.latex"
+					],
+					"geometryValue.wildcard": [
+						"constant.language.wildcard.geometry.latex"
+					],
+					"geometryValue.listValue": [
+						"constant.other.geometry.value.list.latex"
 					]
+
 				}
 			}
 		],
