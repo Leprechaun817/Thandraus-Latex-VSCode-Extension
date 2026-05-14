@@ -80,20 +80,38 @@ const GEOMETRY_KEYS = new Map<string, readonly GeometryModifier[]>([
 	['layouthoffset', ['layout']],
 	['layoutvoffset', ['layout']],
 
-	//margins / body / total
+	//body / total body
+	['hscale', ['margin']],
+	['vscale', ['margin']],
+	['scale', ['margin']],
+	['width', ['margin']],
+	['height', ['margin']],
+	['total', ['margin']],
+	['totalwidth', ['margin']],
+	['totalheight', ['margin']],
+	['text', ['margin']],
+	['body', ['margin']],
+	['textwidth', ['margin']],
+	['textheight', ['margin']],
+	['lines', ['margin']],
+	
+
+	//margins / body partitions
 	['left', ['margin']],
-	['right', ['margin']],
-	['top', ['margin']],
-	['bottom', ['margin']],
+	['lmargin', ['margin']],
 	['inner', ['margin']],
+	['innermargin', ['margin']],
+	['right', ['margin']],
+	['rmargin', ['margin']],
 	['outer', ['margin']],
+	['outermargin', ['margin']],
+	['top', ['margin']],
+	['tmargin', ['margin']],
+	['bottom', ['margin']],
+	['bmargin', ['margin']],
 	['margin', ['margin']],
 	['hmargin', ['margin']],
 	['vmargin', ['margin']],
-	['width', ['margin']],
-	['height', ['margin']],
-	['text', ['margin']],
-	['total', ['margin']],
 	['bindingoffset', ['margin']],
 	['hdivide', ['margin']],
 	['vdivide', ['margin']],
@@ -110,6 +128,8 @@ const GEOMETRY_KEYS = new Map<string, readonly GeometryModifier[]>([
 	['vcentering', ['margin', 'boolean']],
 	['centering', ['margin', 'boolean']],
 
+	
+
 	//Common booleans likely seen in real geometry usage
 	['twoside', ['margin', 'boolean']],
 	['asymmetric', ['margin', 'boolean']],
@@ -123,9 +143,51 @@ const GEOMETRY_KEYS = new Map<string, readonly GeometryModifier[]>([
 	['ignoreheadfoot', ['margin', 'boolean']],
 	['ignoremp', ['margin', 'boolean']],
 	['ignoreall', ['margin', 'boolean']],
+	['heightrounded', ['boolean']],
+
+	//Native Dimensions
+	['headheight', ['margin']],
+	['head', ['margin']],
+	['headsep', ['margin']],
+	['footskip', ['margin']],
+	['foot', ['margin']],
+	['nohead', ['margin', 'boolean']],
+	['nofoot', ['margin', 'boolean']],
+	['noheadfoot', ['margin', 'boolean']],
+	['footnotesep', ['margin']],
+	['marginparwidth', ['margin']],
+	['marginpar', ['margin']],
+	['marginparsep', ['margin']],
+	['nomarginpar', ['margin', 'boolean']],
+	['columnsep', ['margin']],
+	['hoffset', ['margin']],
+	['voffset', ['margin']],
+	['offset', ['margin']],
+	['twocolumn', ['margin', 'boolean']],
+	['onecolumn', ['margin', 'boolean']],
+	['reversemp', ['margin', 'boolean']],
+	['reversemarginpar', ['margin', 'boolean']],
+	
+	//Drivers (LaTeX Drivers)
+	['driver', []],
+	['dvips', ['boolean']],
+	['dvipdfm', ['boolean']],
+	['dvipdfmx', ['boolean']],
+	['xdvipdfmx', ['boolean']],
+	['pdftex', ['boolean']],
+	['luatex', ['boolean']],
+	['xetex', ['boolean']],
+	['vtex', ['boolean']],
+
+	//Other Preamble-based Options
+	['verbose', ['boolean']],
+	['reset', ['boolean']],
+	['resetpaper', ['boolean']],
+	['map', []],
+	['truedimen', ['boolean']],
+	['pass', ['boolean']],
 	['showframe', ['boolean']],
-	['showcrop', ['boolean']],
-	['heightrounded', ['boolean']]
+	['showcrop', ['boolean']]
 ]);
 
 const GEOMETRY_PRESETS = new Map<string, readonly GeometryModifier[]>([
@@ -136,6 +198,7 @@ const GEOMETRY_PRESETS = new Map<string, readonly GeometryModifier[]>([
 	['a4paper', ['paper']],
 	['a5paper', ['paper']],
 	['a6paper', ['paper']],
+
 	['b0paper', ['paper']],
 	['b1paper', ['paper']],
 	['b2paper', ['paper']],
@@ -143,6 +206,7 @@ const GEOMETRY_PRESETS = new Map<string, readonly GeometryModifier[]>([
 	['b4paper', ['paper']],
 	['b5paper', ['paper']],
 	['b6paper', ['paper']],
+
 	['c0paper', ['paper']],
 	['c1paper', ['paper']],
 	['c2paper', ['paper']],
@@ -150,6 +214,7 @@ const GEOMETRY_PRESETS = new Map<string, readonly GeometryModifier[]>([
 	['c4paper', ['paper']],
 	['c5paper', ['paper']],
 	['c6paper', ['paper']],
+
 	['b0j', ['paper']],
 	['b1j', ['paper']],
 	['b2j', ['paper']],
@@ -157,6 +222,13 @@ const GEOMETRY_PRESETS = new Map<string, readonly GeometryModifier[]>([
 	['b4j', ['paper']],
 	['b5j', ['paper']],
 	['b6j', ['paper']],
+
+	['ansiapaper', ['paper']],
+	['ansibpaper', ['paper']],
+	['ansicpaper', ['paper']],
+	['ansidpaper', ['paper']],
+	['ansiepaper', ['paper']],
+
 	['letterpaper', ['paper']],
 	['legalpaper', ['paper']],
 	['executivepaper', ['paper']],
@@ -165,7 +237,36 @@ const GEOMETRY_PRESETS = new Map<string, readonly GeometryModifier[]>([
 
 const PRESET_VALUE_KEYS = new Set(['paper', 'layout']);
 
-const RESTRICTED_IN_NEWGEOMETRY_KEYS = new Set(['paper', 'paperwidth', 'paperheight', 'papersize', 'landscape', 'portrait']);
+const RESTRICTED_IN_NEWGEOMETRY_KEYS = new Set([
+	//Paper size / orientation
+	'paper',
+	'paperwidth',
+	'paperheight',
+	'papersize',
+	'landscape',
+	'portrait',
+
+	//Drivers (LaTeX Drivers)
+	'driver',
+	'dvips',
+	'dvipdfm',
+	'dvipdfmx',
+	'xdvipdfmx',
+	'pdftex',
+	'luatex',
+	'xetex',
+	'vtex',
+
+	//Other Preamble-based options
+	'verbose',
+	'reset',
+	'resetpaper',
+	'mag',
+	'truedimen',
+	'pass',
+	'showframe',
+	'showcrop'
+]);
 
 //bare a4paper, letterpaper, screen, etc.
 const RESTRICTED_IN_NEWGEOMETRY_PRESET_KEYS = new Set([...GEOMETRY_PRESETS.keys()]);
