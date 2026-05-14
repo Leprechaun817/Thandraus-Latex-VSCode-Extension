@@ -1,3 +1,4 @@
 /node_modules
 /out
 Scratch.ts
+package-lock.json
