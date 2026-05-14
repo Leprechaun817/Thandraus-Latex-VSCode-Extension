@@ -2,3 +2,4 @@
 /out
 Scratch.ts
 package-lock.json
+*.json-test
