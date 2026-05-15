@@ -346,9 +346,7 @@ class GeometrySemanticTokensProvider implements vscode.DocumentSemanticTokensPro
 		}
 
 		for(const {invocation, geometryPackage} of geometryPackageInvocations) {
-			//Mark the package name itself (Need to come up with better more descriptive comment here)
-			//Pretty sure by this point we know that the package is used in the document and we're marking
-			//the location of the token within the document
+			// Mark the visible geometry package name as the namespace token that activates geometry semantics.
 			pushTokenByOffsets(builder, document, geometryPackage.start, geometryPackage.end, 'namespace', [], ignoredRanges);
 
 			//Now that we have marked the geometry package, we process the options listed in the package commands:
