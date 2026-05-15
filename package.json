@@ -9,7 +9,7 @@
 		"onLanguage:latex"
 	],
 	"engines": {
-		"vscode": "^1.97.0"
+		"vscode": "^1.120.0"
 	},
 	"categories": [
 		"Programming Languages"
