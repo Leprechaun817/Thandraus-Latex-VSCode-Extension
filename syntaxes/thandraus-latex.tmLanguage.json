@@ -700,6 +700,20 @@
 					}
 				},
 				{
+					"match": "(\\\\)(NewDocumentCommand|RenewDocumentCommand|ProvideDocumentCommand|DeclareDocumentCommand)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.command.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(NewDocumentEnvironment|RenewDocumentEnvironment|ProvideDocumentEnvironment|DeclareDocumentEnvironment)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.environment.latex" }
+					}
+				},
+				{
 					"name": "meta.definition.command.latex",
 					"begin": "(\\\\)(newcommand|renewcommand|providecommand|DeclareRobustCommand)(\\*?)(\\{)(\\\\[A-Za-z@]+)(\\})(?:([\\[])(\\d+)([\\]]))?(?:([\\[])([^\\]]*)([\\]]))?(?=\\s*\\{)",
 					"beginCaptures": {
@@ -759,6 +773,7 @@
 						"3": { "name": "keyword.operator.modifier.star.latex" }
 					}
 				},
+				
 				{
 					"match": "(\\\\)(appendix|listoffigures|listoftables)",
 					"captures": {
