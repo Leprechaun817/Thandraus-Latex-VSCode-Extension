@@ -327,6 +327,7 @@
 					},
 					"patterns": [
 						{ "include": "#latex-balanced-text-group" },
+						{ "include": "#latex-document-interface" },
 						{ "include": "#latex-core-commands" },
 						{ "include": "#latex-references" },
 						{ "include": "#latex-escaped-specials" },
@@ -376,6 +377,7 @@
 					"contentName": "meta.definition.environment.body.content.latex",
 					"patterns": [
 						{ "include": "#latex-balanced-text-group" },
+						{ "include": "#latex-document-interface" },
 						{ "include": "#latex-core-commands" },
 						{ "include": "#latex-references" },
 						{ "include": "#latex-escaped-specials" },
@@ -466,6 +468,7 @@
 		"latex-rich-text-body-patterns": {
 			"patterns": [
 				{ "include": "#latex-balanced-text-group" },
+				{ "include": "#latex-document-interface" },
 				{ "include": "#latex-core-commands" },
 				{ "include": "#latex-references" },
 				{ "include": "#latex-escaped-specials" },
@@ -578,14 +581,14 @@
 		"latex-document-interface": {
 			"patterns": [
 				{
-					"match": "(\\\\)(NewDocumentCommand|RenewDocumentCommand|ProvideDocumentCommand|DeclareDocumentCommand|NewExpandableDocumentCommand|RenewExpandableDocumentCommand|ProvideExpandableDocumentCommand|DeclareExpandableDocumentCommand)",
+					"match": "(\\\\)(NewDocumentCommand|RenewDocumentCommand|ProvideDocumentCommand|DeclareDocumentCommand|NewExpandableDocumentCommand|RenewExpandableDocumentCommand|ProvideExpandableDocumentCommand|DeclareExpandableDocumentCommand)\\b",
 					"captures": {
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.definition.command.latex" }
 					}
 				},
 				{
-					"match": "(\\\\)(NewDocumentEnvironment|RenewDocumentEnvironment|ProvideDocumentEnvironment|DeclareDocumentEnvironment)",
+					"match": "(\\\\)(NewDocumentEnvironment|RenewDocumentEnvironment|ProvideDocumentEnvironment|DeclareDocumentEnvironment)\\b",
 					"captures": {
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.definition.environment.latex" }
@@ -738,6 +741,7 @@
 					"end": "(?<=\\})",
 					"patterns": [
 						{ "include": "#latex-balanced-text-group" },
+						{ "include": "#latex-document-interface" },
 						{ "include": "#tex-parameter-placeholders" },
 						{ "include": "#expl3-definition-forms" },
 						{ "include": "#expl3-control-families" },
