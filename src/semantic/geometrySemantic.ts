@@ -29,7 +29,7 @@ const TOKEN_MODIFIERS = [
 type GeometryTokenType = (typeof TOKEN_TYPES)[number];
 type GeometryModifier = (typeof TOKEN_MODIFIERS)[number];
 
-type GeometryContext = 'usepackage' | 'geometry' | 'newgeometry';
+type GeometryContext = 'documentclass' | 'usepackage' | 'geometry' | 'newgeometry';
 
 interface TextSlice {
 	start: number;
@@ -50,6 +50,13 @@ interface PackageInvocation {
 	options?: BalancedRegion;
 	packageGroup?: BalancedRegion;
 	packages: PackageNameRange[];
+}
+
+interface DocumentClassInvocation{
+	commandStart: number;
+	options?: BalancedRegion;
+	classGroup?: BalancedRegion;
+	className?: PackageNameRange;
 }
 
 const GEOMETRY_LEGEND = new vscode.SemanticTokensLegend(
@@ -239,6 +246,13 @@ const GEOMETRY_PRESETS = new Map<string, readonly GeometryModifier[]>([
 ]);
 
 const PRESET_VALUE_KEYS = new Set(['paper', 'layout']);
+const GEOMETRY_DOCUMENTCLASS_KEYS = new Set([
+	'landscape',
+	'portrait',
+	'twoside',
+	'twocolumn',
+	'onecolumn'
+]);
 
 const NUMERIC_VALUE_KEYS = new Set(['hscale', 'vscale', 'scale']);
 const INTEGER_VALUE_KEYS = new Set(['lines', 'mag']);
@@ -304,34 +318,47 @@ class GeometrySemanticTokensProvider implements vscode.DocumentSemanticTokensPro
 		const ignoredRanges = collectIgnoredRanges(text);
 		const packageInvocations = scanPackageInvocations(text, ignoredRanges);
 
-		let geometryLoadedVisibly = false;
+		const geometryPackageInvocations: Array<{
+			invocation: PackageInvocation; 
+			geometryPackage: PackageNameRange;
+		}> = [];
 
 		for(const invocation of packageInvocations) {
-			const geometryPackage = invocation.packages.find(
-				(pkg) => pkg.name === 'geometry'
-			);
-
+			const geometryPackage = invocation.packages.find((pkg)=>pkg.name === 'geometry');
 			if(!geometryPackage) {
 				continue;
 			}
-			
-			geometryLoadedVisibly = true;
 
-			//Mark the package name itself
+			geometryPackageInvocations.push({invocation, geometryPackage});
+		}
+
+		if(geometryPackageInvocations.length === 0) {
+			return builder.build();
+		}
+
+		//Parse relevant geometry related \documentclass[...] parameters/options first.
+		//In most LaTeX files, the \documentclass command will come before \usepackage{geometry}.
+		//This is why we're checking and processing both separately as far as the geometry package is concerned
+		for(const invocation of scanDocumentClassInvocations(text, ignoredRanges)) {
+			if(invocation.options) {
+				parseGeometryDocumentClassOptions(document, builder, text, invocation.options.contentStart, invocation.options.contentEnd, ignoredRanges);
+			}
+		}
+
+		for(const {invocation, geometryPackage} of geometryPackageInvocations) {
+			//Mark the package name itself (Need to come up with better more descriptive comment here)
+			//Pretty sure by this point we know that the package is used in the document and we're marking
+			//the location of the token within the document
 			pushTokenByOffsets(builder, document, geometryPackage.start, geometryPackage.end, 'namespace', [], ignoredRanges);
 
-			//Parse \usepackage[...]{geometry} / \RequirePackage[...]{geometry}
+			//Now that we have marked the geometry package, we process the options listed in the package commands:
+			//"\usepackage[...]{geometry}" and "\RequirePackage[...]{geometry}"
 			if(invocation.options) {
 				parseGeometryOptionList(document, builder, text, invocation.options.contentStart, invocation.options.contentEnd, 'usepackage', ignoredRanges);
 			}
 		}
 
-		if(!geometryLoadedVisibly) {
-			return builder.build();
-		}
-
 		scanGeometryCommands(document, builder, text, ignoredRanges);
-
 
 		return builder.build();
 	}
@@ -426,6 +453,34 @@ function parseGeometryOptionList(document: vscode.TextDocument, builder: vscode.
 	}
 }
 
+function parseGeometryDocumentClassOptions(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, text: string, start: number, end: number, ignoredRanges: readonly TextSlice[]) : void {
+	for(const item of splitTopLevel(text, start, end, ',')) {
+		const trimmed = trimSlice(text, item.start, item.end);
+		if(!trimmed || rangeIntersectsIgnored(trimmed.start, trimmed.end, ignoredRanges)) {
+			continue;
+		}
+
+		const equalsAt = findTopLevelChar(text, trimmed.start, trimmed.end, '=');
+		
+		const optionSlice = equalsAt === -1 ? trimmed : trimSlice(text, trimmed.start, equalsAt);
+		if(!optionSlice) {
+			continue;
+		}
+
+		const rawName = text.slice(optionSlice.start, optionSlice.end);
+		
+		const name = rawName.toLowerCase();
+		if(GEOMETRY_PRESETS.has(name)) {
+			emitGeometryPreset(document, builder, optionSlice.start, optionSlice.end, name, 'documentclass', false, ignoredRanges);
+			continue;
+		}
+
+		if(GEOMETRY_DOCUMENTCLASS_KEYS.has(name) && GEOMETRY_KEYS.has(name)) {
+			emitGeometryKey(document, builder, optionSlice.start, optionSlice.end, name, 'documentclass', ignoredRanges);
+		}
+	}
+}
+
 function emitGeometryKey(document: vscode.TextDocument, builder: vscode.SemanticTokensBuilder, start: number, end: number, key: string, context: GeometryContext, ignoredRanges: readonly TextSlice[]) : void {
 	const baseModifiers = GEOMETRY_KEYS.get(key);
 	if(!baseModifiers) {
@@ -496,6 +551,50 @@ function scanPackageInvocations(text: string, ignoredRanges: readonly TextSlice[
 		}
 
 		results.push({commandStart, options, packageGroup, packages});
+	}
+
+	return results;
+}
+
+function scanDocumentClassInvocations(text: string, ignoredRanges: readonly TextSlice[]) : DocumentClassInvocation[] {
+	const results: DocumentClassInvocation[] = [];
+	const commandRegex = /\\documentclass\b/g;
+
+	for(const match of text.matchAll(commandRegex)) {
+		const commandStart = match.index ?? 0;
+		if(offsetInRanges(commandStart, ignoredRanges)) {
+			continue;
+		}
+
+		let cursor = skipWhitespace(text, commandStart + match[0].length);
+		let options: BalancedRegion | undefined;
+		if(text[cursor] === '[') {
+			const parsed = readBalanced(text, cursor, '[', ']');
+			if(!parsed) {
+				continue;
+			}
+
+			options = parsed;
+			cursor = skipWhitespace(text, parsed.end + 1);
+		}
+
+		let classGroup: BalancedRegion | undefined;
+		let className: PackageNameRange | undefined;
+		if(text[cursor] === '{') {
+			const parsed = readBalanced(text, cursor, '{', '}');
+			if(parsed) {
+				classGroup = parsed;
+				
+				const trimmed = trimSlice(text, parsed.contentStart, parsed.contentEnd);
+				if(trimmed) {
+					className = {name: text.slice(trimmed.start, trimmed.end).toLowerCase(),
+								 start: trimmed.start,
+								 end: trimmed.end};
+				}
+			}
+		}
+
+		results.push({commandStart, options, classGroup, className});
 	}
 
 	return results;
