@@ -11,6 +11,7 @@
 		{ "include": "#latex-preamble" },
 		{ "include": "#latex-structure" },
 		{ "include": "#latex-references" },
+		{ "include": "#latex-document-interface" },
 		{ "include": "#latex-core-commands" },
 		{ "include": "#latex-escaped-specials" },
 		{ "include": "#expl3-definition-forms" },
@@ -574,6 +575,24 @@
 				}
 			]
 		},
+		"latex-document-interface": {
+			"patterns": [
+				{
+					"match": "(\\\\)(NewDocumentCommand|RenewDocumentCommand|ProvideDocumentCommand|DeclareDocumentCommand|NewExpandableDocumentCommand|RenewExpandableDocumentCommand|ProvideExpandableDocumentCommand|DeclareExpandableDocumentCommand)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.command.latex" }
+					}
+				},
+				{
+					"match": "(\\\\)(NewDocumentEnvironment|RenewDocumentEnvironment|ProvideDocumentEnvironment|DeclareDocumentEnvironment)",
+					"captures": {
+						"1": { "name": "punctuation.definition.command.latex" },
+						"2": { "name": "support.function.definition.environment.latex" }
+					}
+				}
+			]
+		},
 		"latex-core-commands": {
 			"patterns": [
 				{
@@ -697,20 +716,6 @@
 					"captures": {
 						"1": { "name": "punctuation.definition.command.latex" },
 						"2": { "name": "support.function.include.latex" }
-					}
-				},
-				{
-					"match": "(\\\\)(NewDocumentCommand|RenewDocumentCommand|ProvideDocumentCommand|DeclareDocumentCommand)",
-					"captures": {
-						"1": { "name": "punctuation.definition.command.latex" },
-						"2": { "name": "support.function.definition.command.latex" }
-					}
-				},
-				{
-					"match": "(\\\\)(NewDocumentEnvironment|RenewDocumentEnvironment|ProvideDocumentEnvironment|DeclareDocumentEnvironment)",
-					"captures": {
-						"1": { "name": "punctuation.definition.command.latex" },
-						"2": { "name": "support.function.definition.environment.latex" }
 					}
 				},
 				{
